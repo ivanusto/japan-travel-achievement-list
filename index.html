@@ -597,6 +597,39 @@
             flex-direction: column;
             gap: 20px;
             align-items: center;
+            width: 100%;
+        }
+
+        .map-scroll-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            justify-content: flex-start;
+            padding-bottom: 8px;
+        }
+
+        @media (min-width: 640px) {
+            .map-scroll-wrapper {
+                justify-content: center;
+            }
+        }
+
+        .map-scroll-hint {
+            display: none;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: -12px;
+            margin-bottom: 8px;
+            font-weight: 800;
+            text-align: center;
+            width: 100%;
+        }
+
+        @media (max-width: 640px) {
+            .map-scroll-hint {
+                display: block;
+            }
         }
 
         .prefectures-grid-map {
@@ -1296,7 +1329,10 @@
 
                     <div class="map-grid-container">
                         <!-- Grid Japan Map -->
-                        <div class="prefectures-grid-map" id="japanPrefMap"></div>
+                        <div class="map-scroll-wrapper">
+                            <div class="prefectures-grid-map" id="japanPrefMap"></div>
+                        </div>
+                        <div class="map-scroll-hint">💡 左右滑動以檢視完整日本地圖</div>
 
                         <!-- Region Badge stats -->
                         <div class="regions-stats-panel" id="regionsStatsPanel"></div>
