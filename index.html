@@ -1244,7 +1244,10 @@
                         <div class="avatar-edit-hint">✏️</div>
                     </div>
                     <div class="name-wrapper">
-                        <input type="text" id="playerName" class="player-name-input" value="日本探險家" maxlength="15" onchange="saveProfileName(this.value)">
+                        <div style="display:flex; align-items:center; justify-content:center; gap:4px; width:100%; position:relative;">
+                            <input type="text" id="playerName" class="player-name-input" value="日本探險家" maxlength="15" onchange="saveProfileName(this.value)" style="padding-right:24px;">
+                            <span style="font-size:14px; cursor:pointer; opacity:0.6; position:absolute; right:15px; top:50%; transform:translateY(-50%);" onclick="focusPlayerName()" title="點擊修改暱稱">✏️</span>
+                        </div>
                         <div class="player-title" id="playerTitle">🌱 日本新手</div>
                     </div>
                 </div>
@@ -1695,7 +1698,8 @@
             playerAvatar: "🥋",
             checkedAchievements: [],
             visitedPrefectures: [],
-            theme: "dark"
+            theme: "dark",
+            registered: false
         };
 
         let activeFilters = {
@@ -1908,6 +1912,11 @@
             // Profile info
             document.getElementById('playerName').value = appState.playerName;
             document.getElementById('playerAvatar').textContent = appState.playerAvatar;
+
+            // Trigger registration modal if first visit
+            if (!appState.registered) {
+                openRegistrationModal();
+            }
         }
 
         function resetProgress() {
@@ -2818,6 +2827,66 @@
             showNotification("圖卡下載成功", "歡迎分享到 Threads 或 Instagram！", "📸");
         }
 
+        // --- Character Registration ---
+        let selectedRegisterAvatar = "🥋";
+        
+        function openRegistrationModal() {
+            const modal = document.getElementById('charRegisterModal');
+            const grid = document.getElementById('registerAvatarGrid');
+            grid.innerHTML = '';
+            
+            avatars.forEach(emoji => {
+                const opt = document.createElement('div');
+                opt.className = 'avatar-option';
+                opt.textContent = emoji;
+                if (emoji === selectedRegisterAvatar) {
+                    opt.style.borderColor = 'var(--border-color-active)';
+                    opt.style.transform = 'scale(1.1)';
+                }
+                opt.onclick = () => {
+                    selectedRegisterAvatar = emoji;
+                    // Reset all borders and highlight selected
+                    document.querySelectorAll('#registerAvatarGrid .avatar-option').forEach(el => {
+                        el.style.borderColor = '';
+                        el.style.transform = '';
+                    });
+                    opt.style.borderColor = 'var(--border-color-active)';
+                    opt.style.transform = 'scale(1.1)';
+                };
+                grid.appendChild(opt);
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function completeRegistration() {
+            const nameInput = document.getElementById('registerNameInput');
+            const name = nameInput.value.trim() || "日本探險家";
+            
+            appState.playerName = name;
+            appState.playerAvatar = selectedRegisterAvatar;
+            appState.registered = true;
+            
+            // Sync to DOM
+            document.getElementById('playerName').value = name;
+            document.getElementById('playerAvatar').textContent = selectedRegisterAvatar;
+            
+            // Close modal
+            document.getElementById('charRegisterModal').style.display = 'none';
+            
+            saveState();
+            updateUI();
+            
+            // Play sweet unlock chime and confetti for starting
+            setTimeout(() => {
+                showNotification("冒險開始！", `探險家 ${name}，祝您日本旅行愉快！`, "🎒");
+            }, 500);
+        }
+
+        function focusPlayerName() {
+            document.getElementById('playerName').focus();
+        }
+
         // --- 19. Initializer ---
         window.onload = function() {
             loadState();
@@ -2825,5 +2894,28 @@
             updateUI();
         };
     </script>
+
+    <!-- Character Registration Modal -->
+    <div class="avatar-picker-backdrop" id="charRegisterModal" style="display: none;">
+        <div class="avatar-picker-modal" style="max-width: 450px;">
+            <h2 style="margin-top:0; color: var(--accent-red); font-weight:900;">🎒 探險家登錄</h2>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:20px;">
+                歡迎來到日本旅行成就系統！請為您的手帳進行首次角色登錄：
+            </p>
+            
+            <div style="display:flex; flex-direction:column; gap:16px; align-items:center; margin-bottom:20px; text-align:left;">
+                <div style="font-size:12px; font-weight:800; color:var(--text-secondary); align-self:flex-start;">1. 選擇起手頭像</div>
+                <div class="avatar-picker-grid" id="registerAvatarGrid" style="margin:5px 0; width:100%;"></div>
+                
+                <div style="font-size:12px; font-weight:800; color:var(--text-secondary); align-self:flex-start;">2. 輸入您的暱稱</div>
+                <input type="text" id="registerNameInput" placeholder="例如：日本旅人小明..." maxlength="15" 
+                       style="width:100%; padding:12px; font-size:16px; font-weight:800; text-align:center; border-radius:8px; border:2px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); outline:none;">
+            </div>
+            
+            <button class="btn btn-accent" style="width:100%; padding:14px; font-size:14px; font-weight:900; justify-content:center;" onclick="completeRegistration()">
+                🎮 登錄完成，開始冒險！
+            </button>
+        </div>
+    </div>
 </body>
 </html>
