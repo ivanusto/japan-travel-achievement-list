@@ -2713,12 +2713,12 @@
                 ctx.strokeStyle = gridColor;
                 ctx.stroke();
             }
-            ctx.font = 'bold 9px sans-serif';
+            ctx.font = 'bold 14px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             for (let i = 0; i < numPoints; i++) {
                 const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
-                const labelDist = rr + 15;
+                const labelDist = rr + 24;
                 const xLabel = rcx + Math.cos(angle) * labelDist;
                 const yLabel = rcy + Math.sin(angle) * labelDist;
                 ctx.fillStyle = labelColor;
