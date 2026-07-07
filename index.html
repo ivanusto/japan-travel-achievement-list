@@ -1812,33 +1812,68 @@
             }
         });
 
-        // --- 6. Steam Style Notifications Queue ---
-        let toastQueue = [];
-        let isShowingToast = false;
+        // --- 6. Steam Style Notifications (Optimized Debounce & Stacking) ---
+        let pendingNotifications = [];
+        let notificationTimeout = null;
 
         function showNotification(title, desc, emoji) {
-            toastQueue.push({ title, desc, emoji });
-            processToastQueue();
+            pendingNotifications.push({ title, desc, emoji });
+            
+            if (notificationTimeout) clearTimeout(notificationTimeout);
+            notificationTimeout = setTimeout(flushNotifications, 200);
         }
 
-        function processToastQueue() {
-            if (isShowingToast || toastQueue.length === 0) return;
-            isShowingToast = true;
+        function flushNotifications() {
+            if (pendingNotifications.length === 0) return;
 
-            const item = toastQueue.shift();
             const container = document.getElementById('toastContainer');
             if (!container) return;
+
+            // Separate badge notifications from others so badges always show clearly
+            const badgeNotifications = pendingNotifications.filter(n => n.title.includes("徽章"));
+            const regularNotifications = pendingNotifications.filter(n => !n.title.includes("徽章"));
+
+            // Process regular notifications
+            if (regularNotifications.length === 1) {
+                const item = regularNotifications[0];
+                createToastElement(item.title, item.desc, item.emoji);
+            } else if (regularNotifications.length > 1) {
+                const count = regularNotifications.length;
+                const title = "🌟 複數成就解除！";
+                const desc = `您一口氣解鎖了 ${count} 個旅行項目！`;
+                createToastElement(title, desc, "🌟");
+            }
+
+            // Process badge notifications (always show individually to feel rewarding)
+            badgeNotifications.forEach(badgeItem => {
+                createToastElement(badgeItem.title, badgeItem.desc, badgeItem.emoji);
+            });
+
+            // Clear pending list
+            pendingNotifications = [];
+        }
+
+        function createToastElement(title, desc, emoji) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            // Limit visible toasts on screen to prevent overlapping or screen clutter (max 4)
+            if (container.children.length >= 4) {
+                container.children[0].remove();
+            }
 
             const toast = document.createElement('div');
             toast.className = 'toast-notification';
             toast.innerHTML = `
-                <div class="toast-icon">${item.emoji}</div>
+                <div class="toast-icon">${emoji}</div>
                 <div class="toast-content">
-                    <div class="toast-title">${item.title}</div>
-                    <div class="toast-desc">${item.desc}</div>
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-desc">${desc}</div>
                 </div>
             `;
             container.appendChild(toast);
+            
+            // Trigger audio and visual chimes
             playChime();
             triggerConfetti();
 
@@ -1846,8 +1881,6 @@
                 toast.classList.add('hide');
                 toast.addEventListener('animationend', () => {
                     toast.remove();
-                    isShowingToast = false;
-                    setTimeout(processToastQueue, 100);
                 });
             }, 3000);
         }
