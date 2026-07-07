@@ -1,0 +1,2796 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本旅行成就系統 Ultimate Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
+
+        :root {
+            /* Dark Theme (Default) */
+            --bg-primary: #12181f;
+            --bg-card: #1b2838;
+            --bg-card-hover: #223246;
+            --border-color: #2a475e;
+            --border-color-active: #00d2ff;
+            --text-primary: #f3f3f3;
+            --text-secondary: #c7d5e0;
+            --text-muted: #8fa0b0;
+            --accent-red: #ff003c; /* Switch Red */
+            --accent-blue: #00d2ff; /* Switch Blue */
+            --accent-gold: #ffd700; /* Legendary Gold */
+            --accent-purple: #9d4edd; /* Epic Purple */
+            --accent-green: #00ff87; /* Rare Green */
+            --shadow-primary: rgba(0, 0, 0, 0.4);
+            --shadow-glow: rgba(0, 210, 255, 0.25);
+            --washi-bg: radial-gradient(circle at 20% 30%, #17202d 0%, #11161e 100%);
+            --header-gradient: linear-gradient(135deg, #1b2838 0%, #101924 100%);
+        }
+
+        [data-theme="light"] {
+            /* Light Theme (Travel Notebook) */
+            --bg-primary: #faf6f0; /* Traditional Washi paper white */
+            --bg-card: #ffffff;
+            --bg-card-hover: #fcf9f5;
+            --border-color: #e6dcd0; /* Soft warm border */
+            --border-color-active: #d71318; /* Shrine red */
+            --text-primary: #2c2a29; /* Charcoal black ink */
+            --text-secondary: #5a5754;
+            --text-muted: #8b8882;
+            --accent-red: #d71318; /* Vermilion red */
+            --accent-blue: #1c4587; /* Indigo */
+            --accent-gold: #c5a059; /* Traditional gold */
+            --accent-purple: #7851a9; /* Imperial violet */
+            --accent-green: #2e5c1e; /* Bamboo green */
+            --shadow-primary: rgba(184, 134, 11, 0.1);
+            --shadow-glow: rgba(215, 19, 24, 0.15);
+            --washi-bg: radial-gradient(circle at 50% 50%, #faf6f0 0%, #f3ede2 100%);
+            --header-gradient: linear-gradient(135deg, #ffffff 0%, #f9f6f0 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Outfit', 'Noto Sans TC', 'Noto Sans JP', sans-serif;
+            background: var(--washi-bg);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Particles canvas overlay */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Steam Toast Notification Container */
+        #toastContainer {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast-notification {
+            background: rgba(27, 40, 56, 0.95);
+            border-left: 6px solid var(--accent-gold);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            padding: 16px 20px;
+            width: 320px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            backdrop-filter: blur(10px);
+            color: #fff;
+        }
+
+        [data-theme="light"] .toast-notification {
+            background: rgba(255, 255, 255, 0.95);
+            border-left: 6px solid var(--accent-red);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+            border-right: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(184, 134, 11, 0.15);
+            color: var(--text-primary);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast-notification.hide {
+            animation: slideOut 0.3s ease forwards;
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(120%); opacity: 0; }
+        }
+
+        .toast-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .toast-content {
+            flex-grow: 1;
+        }
+
+        .toast-title {
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 2px;
+        }
+
+        [data-theme="light"] .toast-title {
+            color: var(--accent-red);
+        }
+
+        .toast-desc {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* App Container Layout */
+        .app-wrapper {
+            max-width: 1400px;
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Header Style */
+        header {
+            background: var(--header-gradient);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--box-shadow);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-title-section h1 {
+            margin: 0 0 6px 0;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-section p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Button styling */
+        .btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            background: var(--bg-card-hover);
+            border-color: var(--border-color-active);
+            box-shadow: 0 4px 12px var(--shadow-glow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-accent {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: #fff;
+        }
+        
+        .btn-accent:hover {
+            background: #ff2255;
+            border-color: #ff2255;
+        }
+
+        [data-theme="light"] .btn-accent {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+        [data-theme="light"] .btn-accent:hover {
+            background: #b50e12;
+            border-color: #b50e12;
+        }
+
+        /* Grid dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 380px 1fr;
+            }
+            .main-content {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        /* Cards basic styling */
+        .card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-primary);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Player Profile Card */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 16px;
+            border-bottom: 2px dashed var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+        }
+
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--border-color-active);
+            background: var(--bg-card-hover);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            box-shadow: 0 0 20px var(--shadow-glow);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .avatar-wrapper:hover .avatar-circle {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 0 30px var(--border-color-active);
+        }
+
+        .avatar-edit-hint {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--border-color-active);
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border: 2px solid var(--bg-card);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .name-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .player-name-input {
+            background: transparent;
+            border: 1px dashed transparent;
+            color: var(--text-primary);
+            font-size: 20px;
+            font-weight: 800;
+            text-align: center;
+            padding: 4px;
+            border-radius: 6px;
+            width: 100%;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .player-name-input:focus, .player-name-input:hover {
+            border-color: var(--border-color-active);
+            background: rgba(255,255,255,0.05);
+        }
+
+        [data-theme="light"] .player-name-input:focus, [data-theme="light"] .player-name-input:hover {
+            background: rgba(0,0,0,0.02);
+        }
+
+        .player-title {
+            color: var(--accent-gold);
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        [data-theme="light"] .player-title {
+            color: var(--accent-red);
+        }
+
+        /* Avatar Picker Modal styles */
+        .avatar-picker-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-picker-modal {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .avatar-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .avatar-option {
+            font-size: 40px;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            cursor: pointer;
+            background: var(--bg-primary);
+            transition: all 0.2s;
+        }
+
+        .avatar-option:hover {
+            border-color: var(--border-color-active);
+            transform: scale(1.1);
+        }
+
+        /* Stats Bar Widget */
+        .stats-bar-widget {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .stats-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .progress-track {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            height: 16px;
+            border-radius: 8px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-red) 100%);
+            height: 100%;
+            width: 0%;
+            border-radius: 8px;
+            transition: width 0.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+            position: relative;
+            box-shadow: 0 0 10px var(--shadow-glow);
+        }
+
+        /* Radar Card */
+        .radar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #radarCanvas {
+            max-width: 100%;
+            width: 300px;
+            height: 300px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        /* Badge Wall */
+        .badge-wall-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .badge-title-header {
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .badge-wall-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .badge-item {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+
+        .badge-item.unlocked {
+            opacity: 1;
+            filter: grayscale(0);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.25);
+            background: radial-gradient(circle, var(--bg-card-hover) 0%, var(--bg-card) 100%);
+        }
+
+        .badge-item:hover {
+            transform: translateY(-4px) scale(1.08);
+            border-color: var(--border-color-active);
+        }
+
+        /* Badge Tooltip simple pure-CSS overlay approach */
+        .badge-item::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #1b2838;
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 100;
+            border: 1px solid var(--border-color-active);
+        }
+
+        [data-theme="light"] .badge-item::after {
+            background: #ffffff;
+            color: var(--text-primary);
+            border-color: var(--border-color-active);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .badge-item:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Map and prefecture sections */
+        .map-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .map-section-title {
+            font-size: 20px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Prefecture Grid Map Layout */
+        .map-grid-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .prefectures-grid-map {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            grid-template-rows: repeat(12, 1fr);
+            gap: 5px;
+            width: 100%;
+            max-width: 580px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        [data-theme="light"] .prefectures-grid-map {
+            background: rgba(184, 134, 11, 0.04);
+            border-color: var(--border-color);
+        }
+
+        .pref-cell {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .pref-cell:hover {
+            transform: scale(1.15);
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border-color: #fff;
+        }
+
+        .pref-cell.visited {
+            background-color: var(--accent-red) !important;
+            border-color: #fff !important;
+            box-shadow: 0 0 10px var(--accent-red);
+            animation: stampPulse 0.3s ease;
+        }
+
+        @keyframes stampPulse {
+            0% { transform: scale(1.4); }
+            100% { transform: scale(1.0); }
+        }
+
+        /* Region completions */
+        .regions-stats-panel {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .region-badge {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .region-badge:hover {
+            border-color: var(--border-color-active);
+            transform: translateY(-2px);
+        }
+
+        .region-badge.active {
+            border-color: var(--accent-red);
+            background: rgba(255, 0, 60, 0.05);
+        }
+
+        .region-badge-header {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+        }
+
+        .region-badge-bar {
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .region-badge-fill {
+            height: 100%;
+            background: var(--border-color-active);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Filter Section */
+        .filters-panel {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .filter-row-top {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex-grow: 1;
+            position: relative;
+            min-width: 250px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            font-weight: 600;
+            padding-right: 40px;
+        }
+
+        .search-input:focus {
+            border-color: var(--border-color-active);
+            box-shadow: 0 0 10px var(--shadow-glow);
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 16px;
+            display: none;
+        }
+
+        .filter-groups {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .select-filter {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .select-filter:focus, .select-filter:hover {
+            border-color: var(--border-color-active);
+        }
+
+        .stats-quick-filters {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .quick-filter-tag {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-filter-tag:hover, .quick-filter-tag.active {
+            border-color: var(--border-color-active);
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        /* Achievements Container */
+        .category-wrapper {
+            margin-bottom: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-card);
+            overflow: hidden;
+            box-shadow: var(--shadow-primary);
+        }
+
+        .category-header {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            background: rgba(0,0,0,0.1);
+            transition: background 0.2s;
+        }
+
+        .category-header:hover {
+            background: rgba(0,0,0,0.2);
+        }
+
+        [data-theme="light"] .category-header {
+            background: rgba(184, 134, 11, 0.02);
+        }
+
+        [data-theme="light"] .category-header:hover {
+            background: rgba(184, 134, 11, 0.05);
+        }
+
+        .category-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+
+        .category-progress-pill {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-secondary);
+        }
+
+        .category-toggle-icon {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .category-wrapper.collapsed .category-toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .category-content {
+            padding: 24px;
+            border-top: 1px solid var(--border-color);
+            display: block;
+        }
+
+        .category-wrapper.collapsed .category-content {
+            display: none;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .achievements-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .achievements-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Achievement Card Styles */
+        .achievement-card {
+            background: var(--bg-primary);
+            border: 1px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-4px);
+            border-style: solid;
+            border-color: var(--border-color-active);
+            box-shadow: 0 6px 16px var(--shadow-primary);
+        }
+
+        .ach-checkbox-container {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ach-checkbox {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .ach-checkbox-custom {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-card);
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .ach-checkbox:checked + .ach-checkbox-custom {
+            background-color: var(--accent-red);
+            border-color: var(--accent-red);
+            box-shadow: 0 0 8px var(--accent-red);
+        }
+
+        .ach-checkbox:checked + .ach-checkbox-custom::after {
+            content: "✓";
+            color: #fff;
+            position: absolute;
+            font-size: 16px;
+            font-weight: 900;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .ach-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ach-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .ach-name {
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .ach-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .ach-difficulty-stars {
+            color: var(--accent-gold);
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        /* Rarity Badge styling */
+        .rarity-pill {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rarity-common {
+            background: rgba(143, 160, 176, 0.15);
+            color: var(--text-muted);
+            border: 1px solid var(--text-muted);
+        }
+
+        .rarity-rare {
+            background: rgba(0, 255, 135, 0.1);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+
+        .rarity-epic {
+            background: rgba(157, 78, 221, 0.1);
+            color: var(--accent-purple);
+            border: 1px solid var(--accent-purple);
+        }
+
+        .rarity-legendary {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+            animation: pulseLegendary 2s infinite alternate;
+        }
+
+        @keyframes pulseLegendary {
+            0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.2); }
+            100% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+        }
+
+        /* Card Checked state */
+        .achievement-card.completed {
+            background: var(--bg-card-hover);
+            border-style: solid;
+            border-color: var(--border-color-active);
+        }
+
+        .achievement-card.completed .ach-name {
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        /* Hidden Achievement Style */
+        .achievement-card.hidden-ach {
+            filter: brightness(0.85);
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        .achievement-card.hidden-ach .ach-name {
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        .achievement-card.hidden-ach .ach-desc {
+            font-style: italic;
+            opacity: 0.6;
+        }
+
+        .achievement-card.hidden-ach .hidden-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(12, 18, 25, 0.96);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--accent-gold);
+            pointer-events: none;
+            z-index: 5;
+            transition: opacity 0.3s;
+        }
+
+        [data-theme="light"] .achievement-card.hidden-ach .hidden-overlay {
+            background: rgba(250, 246, 240, 0.97);
+            color: var(--accent-red);
+        }
+
+        .achievement-card.hidden-ach:hover .hidden-overlay {
+            opacity: 0.05;
+        }
+
+        .achievement-card.hidden-ach.completed .hidden-overlay {
+            display: none !important;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 2px dashed var(--border-color);
+            margin-top: 40px;
+            padding: 30px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .footer-social-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .footer-social-links a {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+            background: var(--bg-card);
+        }
+
+        .footer-social-links a:hover {
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+            transform: translateY(-2px);
+        }
+
+        .footer-credit {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Utilities */
+        .hidden-element {
+            display: none !important;
+        }
+
+        /* Share Canvas Modal */
+        #shareModalBackdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 11000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .share-modal-content {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #sharingPreviewCanvas {
+            max-width: 100%;
+            max-height: 55vh;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .share-actions {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .share-actions button {
+            flex-grow: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="confettiCanvas"></canvas>
+
+    <div id="toastContainer"></div>
+
+    <div class="app-wrapper">
+        <header>
+            <div class="header-title-section">
+                <h1>🇯🇵 日本旅行成就系統 <span style="font-size:16px; background:var(--accent-red); color:#fff; padding:2px 8px; border-radius:4px; font-weight:800;">ULTIMATE</span></h1>
+                <p>探索東瀛足跡 • 解鎖冒險徽章 • 完成你的日本旅行手帳</p>
+            </div>
+            <div class="header-controls">
+                <button class="btn btn-accent" onclick="generateShareCard()">
+                    <span>📸</span> 一鍵分享成就卡
+                </button>
+                <button class="btn" id="themeToggleBtn" onclick="toggleTheme()">
+                    <span id="themeToggleIcon">☀️</span> <span id="themeToggleText">切換淺色</span>
+                </button>
+                <button class="btn" onclick="exportData()">
+                    <span>📤</span> 匯出備份
+                </button>
+                <button class="btn" onclick="document.getElementById('importFile').click()">
+                    <span>📥</span> 導入備份
+                </button>
+                <input type="file" id="importFile" class="hidden-element" accept=".json" onchange="importData(event)">
+                <button class="btn" onclick="resetProgress()" style="color: var(--accent-red); border-color: rgba(255, 0, 60, 0.3);">
+                    <span>🔄</span> 重置
+                </button>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- Left Side Dashboard Details -->
+            <div class="card" style="height: fit-content;">
+                <!-- Profile Section -->
+                <div class="profile-container">
+                    <div class="avatar-wrapper" onclick="openAvatarPicker()">
+                        <div class="avatar-circle" id="playerAvatar">🥋</div>
+                        <div class="avatar-edit-hint">✏️</div>
+                    </div>
+                    <div class="name-wrapper">
+                        <input type="text" id="playerName" class="player-name-input" value="日本探險家" maxlength="15" onchange="saveProfileName(this.value)">
+                        <div class="player-title" id="playerTitle">🌱 日本新手</div>
+                    </div>
+                </div>
+
+                <!-- Level XP Section -->
+                <div class="stats-bar-widget">
+                    <div class="stats-info">
+                        <span id="playerLevelDisplay">LEVEL 0</span>
+                        <span id="playerXpDisplay">0 / 10 成就</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar-fill" id="playerLevelProgress"></div>
+                    </div>
+                </div>
+
+                <!-- Radar Chart Section -->
+                <div class="radar-container">
+                    <div style="font-size: 15px; font-weight: 800; color: var(--text-secondary); width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; text-align: left;">
+                        📊 分類探索度 (雷達圖)
+                    </div>
+                    <canvas id="radarCanvas" width="300" height="300"></canvas>
+                </div>
+
+                <!-- Badge wall -->
+                <div class="badge-wall-container">
+                    <div class="badge-title-header">
+                        <span>🏆 徽章展示牆</span>
+                        <span id="badgeUnlockCount">0 / 13</span>
+                    </div>
+                    <div class="badge-wall-grid" id="badgeWallGrid"></div>
+                </div>
+            </div>
+
+            <!-- Right Side Interactive Map & Content -->
+            <div class="main-content">
+                <!-- Map Card -->
+                <div class="card">
+                    <div class="map-section-header">
+                        <div class="map-section-title">
+                            <span>🗾</span> 都道府縣足跡地圖 (<span id="totalPrefPercentage">0%</span>)
+                        </div>
+                        <div style="font-size: 13px; font-weight: 800; color: var(--text-secondary);" id="totalPrefCount">
+                            已踩點 0 / 47
+                        </div>
+                    </div>
+
+                    <div class="map-grid-container">
+                        <!-- Grid Japan Map -->
+                        <div class="prefectures-grid-map" id="japanPrefMap"></div>
+
+                        <!-- Region Badge stats -->
+                        <div class="regions-stats-panel" id="regionsStatsPanel"></div>
+                    </div>
+                </div>
+
+                <!-- Filters panel -->
+                <div class="filters-panel">
+                    <div class="filter-row-top">
+                        <div class="search-box">
+                            <input type="text" id="searchBar" class="search-input" placeholder="搜尋成就名稱或說明描述..." oninput="handleSearch(this.value)">
+                            <button class="clear-search-btn" id="clearSearchBtn" onclick="clearSearch()">✕</button>
+                        </div>
+                        <div class="filter-groups">
+                            <select id="diffFilter" class="select-filter" onchange="filterAchievements()">
+                                <option value="all">所有難度</option>
+                                <option value="1">★☆☆☆☆ (新手)</option>
+                                <option value="2">★★☆☆☆ (旅人)</option>
+                                <option value="3">★★★☆☆ (探索者)</option>
+                                <option value="4">★★★★☆ (日本迷)</option>
+                                <option value="5">★★★★★ (修羅)</option>
+                                <option value="6">★★★★★★ (隱藏)</option>
+                            </select>
+                            <select id="rarityFilter" class="select-filter" onchange="filterAchievements()">
+                                <option value="all">所有稀有度</option>
+                                <option value="Common">Common</option>
+                                <option value="Rare">Rare</option>
+                                <option value="Epic">Epic</option>
+                                <option value="Legendary">Legendary</option>
+                            </select>
+                            <select id="statusFilter" class="select-filter" onchange="filterAchievements()">
+                                <option value="all">所有狀態</option>
+                                <option value="completed">已解鎖</option>
+                                <option value="uncompleted">未解鎖</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-quick-filters">
+                        <span>快速篩選徽章：</span>
+                        <div class="quick-filter-tag active" id="badgeTag-all" onclick="filterByBadge('all')">全部</div>
+                        <div class="quick-filter-tag" id="badgeTag-railfan" onclick="filterByBadge('railfan')">🚄 鐵道迷</div>
+                        <div class="quick-filter-tag" id="badgeTag-onsen" onclick="filterByBadge('onsen')">♨️ 溫泉達人</div>
+                        <div class="quick-filter-tag" id="badgeTag-sushi" onclick="filterByBadge('sushi')">🍣 壽司王</div>
+                        <div class="quick-filter-tag" id="badgeTag-sake" onclick="filterByBadge('sake')">🍶 日本酒專家</div>
+                        <div class="quick-filter-tag" id="badgeTag-castle" onclick="filterByBadge('castle')">🏯 城郭控</div>
+                        <div class="quick-filter-tag" id="badgeTag-sakura" onclick="filterByBadge('sakura')">🌸 櫻花收藏家</div>
+                        <div class="quick-filter-tag" id="badgeTag-momiji" onclick="filterByBadge('momiji')">🍁 紅葉巡禮者</div>
+                        <div class="quick-filter-tag" id="badgeTag-shrine" onclick="filterByBadge('shrine')">🎌 神社巡禮</div>
+                        <div class="quick-filter-tag" id="badgeTag-nationalpark" onclick="filterByBadge('nationalpark')">🏕 國立公園玩家</div>
+                        <div class="quick-filter-tag" id="badgeTag-island" onclick="filterByBadge('island')">🚢 跳島旅行家</div>
+                        <div class="quick-filter-tag" id="badgeTag-snow" onclick="filterByBadge('snow')">🏂 雪國玩家</div>
+                        <div class="quick-filter-tag" id="badgeTag-culture" onclick="filterByBadge('culture')">🎭 日本文化控</div>
+                        <div class="quick-filter-tag" id="badgeTag-anime" onclick="filterByBadge('anime')">🎬 聖地巡禮家</div>
+                    </div>
+                </div>
+
+                <!-- Collapsible categories achievements -->
+                <div id="achievementsContainer"></div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-social-links">
+                <a href="https://yblog.org/" target="_blank" rel="noreferrer noopener">Yblog.org 優格網</a>
+                <a href="https://www.threads.com/@ivanusto" target="_blank" rel="noreferrer noopener">ivanusto @ threads</a>
+                <a href="https://x.com/ivanusto" target="_blank" rel="noreferrer noopener">ivanusto @ twitter</a>
+                <a href="https://www.plurk.com/ivanusto" target="_blank" rel="noreferrer noopener">ivanusto @ plurk</a>
+                <a href="https://www.instagram.com/ivanusto/" target="_blank" rel="noreferrer noopener">ivanusto @ instagram</a>
+                <a href="https://www.facebook.com/ivanusto" target="_blank" rel="noreferrer noopener">ivanusto @ facebook</a>
+            </div>
+            <div class="footer-credit">
+                © 2026 日本旅行成就系統 Ultimate Edition. All rights reserved. Created with 💖 for Japan Travelers.
+            </div>
+        </footer>
+    </div>
+
+    <!-- Avatar Picker Dialog backdrop -->
+    <div class="avatar-picker-backdrop" id="avatarPickerModal" onclick="closeAvatarPicker()">
+        <div class="avatar-picker-modal" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0;">選擇頭像 Emojis</h3>
+            <div class="avatar-picker-grid" id="avatarPickerGrid"></div>
+            <button class="btn btn-accent" style="width:100%;" onclick="closeAvatarPicker()">關閉</button>
+        </div>
+    </div>
+
+    <!-- Share PNG Card Modal -->
+    <div id="shareModalBackdrop" onclick="closeShareModal()">
+        <div class="share-modal-content" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0; margin-bottom:10px;">📸 生成個人旅行成就卡</h3>
+            <p style="margin:0 0 10px 0; font-size:13px; color:var(--text-secondary); text-align:center;">
+                你可以將此圖卡分享到社交媒體（如 Threads, IG 等），向大家炫耀你的日本旅遊歷練！
+            </p>
+            <canvas id="sharingPreviewCanvas" width="800" height="1200"></canvas>
+            <div class="share-actions">
+                <button class="btn btn-accent" onclick="downloadShareCard()">下載 PNG 圖片</button>
+                <button class="btn" onclick="closeShareModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Emojis and Config Databases ---
+        const avatars = ["🥋", "👘", "🍣", "🏯", "🦊", "🐱", "🐒", "🏔️", "🚄", "👺", "🐙", "🌸", "🍵", "🦌", "🍜", "🎒"];
+
+        const badgeData = [
+            { id: "railfan", name: "鐵道迷", emoji: "🚄", desc: "解鎖 6 項鐵道/交通成就", threshold: 6 },
+            { id: "onsen", name: "溫泉達人", emoji: "♨️", desc: "解鎖 5 項溫泉/秘湯成就", threshold: 5 },
+            { id: "sushi", name: "壽司王", emoji: "🍣", desc: "解鎖 4 項壽司/海產/魚市成就", threshold: 4 },
+            { id: "sake", name: "日本酒專家", emoji: "🍶", desc: "解鎖 3 項清酒/酒場成就", threshold: 3 },
+            { id: "castle", name: "城郭控", emoji: "🏯", desc: "解鎖 3 項日本城池成就", threshold: 3 },
+            { id: "sakura", name: "櫻花收藏家", emoji: "🌸", desc: "解鎖 3 項櫻花/賞花景點成就", threshold: 3 },
+            { id: "momiji", name: "紅葉巡禮者", emoji: "🍁", desc: "解鎖 2 項紅葉/賞楓名所成就", threshold: 2 },
+            { id: "shrine", name: "神社巡禮", emoji: "🎌", desc: "解鎖 5 項神社/朱印/古道巡禮成就", threshold: 5 },
+            { id: "nationalpark", name: "國立公園玩家", emoji: "🏕", desc: "解鎖 5 項世界遺產/山林自然成就", threshold: 5 },
+            { id: "island", name: "跳島旅行家", emoji: "🚢", desc: "解鎖 4 項離島/遊船/跳島成就", threshold: 4 },
+            { id: "snow", name: "雪國玩家", emoji: "🏂", desc: "解鎖 4 項冬雪/冰雪祭典成就", threshold: 4 },
+            { id: "culture", name: "日本文化控", emoji: "🎭", desc: "解鎖 8 項傳統文化與生活體驗成就", threshold: 8 },
+            { id: "anime", name: "聖地巡禮家", emoji: "🎬", desc: "解鎖 4 項動漫/Live/演唱會巡禮成就", threshold: 4 }
+        ];
+
+        const prefecturesData = [
+            // Row is 1-indexed, Col is 1-indexed (Grid dimensions: 13 cols, 12 rows)
+            { id: "hokkaido", name: "北海道", region: "北海道", row: 1, col: 12, rowSpan: 2, colSpan: 2, color: "#2b5c8f" },
+            
+            { id: "aomori", name: "青森", region: "東北", row: 3, col: 11, color: "#368a86" },
+            { id: "akita", name: "秋田", region: "東北", row: 4, col: 10, color: "#368a86" },
+            { id: "iwate", name: "岩手", region: "東北", row: 4, col: 11, color: "#368a86" },
+            { id: "yamagata", name: "山形", region: "東北", row: 5, col: 10, color: "#368a86" },
+            { id: "miyagi", name: "宮城", region: "東北", row: 5, col: 11, color: "#368a86" },
+            { id: "fukushima", name: "福島", region: "東北", row: 6, col: 11, color: "#368a86" },
+            
+            { id: "ibaraki", name: "茨城", region: "關東", row: 7, col: 11, color: "#8a56ac" },
+            { id: "tochigi", name: "栃木", region: "關東", row: 7, col: 10, color: "#8a56ac" },
+            { id: "gunma", name: "群馬", region: "關東", row: 7, col: 9, color: "#8a56ac" },
+            { id: "saitama", name: "埼玉", region: "關東", row: 8, col: 10, color: "#8a56ac" },
+            { id: "chiba", name: "千葉", region: "關東", row: 8, col: 11, color: "#8a56ac" },
+            { id: "tokyo", name: "東京", region: "關東", row: 9, col: 10, color: "#ff003c" },
+            { id: "kanagawa", name: "神奈川", region: "關東", row: 9, col: 9, color: "#8a56ac" },
+            
+            { id: "niigata", name: "新潟", region: "中部", row: 6, col: 9, color: "#2e7d32" },
+            { id: "toyama", name: "富山", region: "中部", row: 6, col: 8, color: "#2e7d32" },
+            { id: "ishikawa", name: "石川", region: "中部", row: 5, col: 7, color: "#2e7d32" },
+            { id: "fukui", name: "福井", region: "中部", row: 6, col: 7, color: "#2e7d32" },
+            { id: "yamanashi", name: "山梨", region: "中部", row: 8, col: 9, color: "#2e7d32" },
+            { id: "nagano", name: "長野", region: "中部", row: 7, col: 8, color: "#2e7d32" },
+            { id: "gifu", name: "岐阜", region: "中部", row: 8, col: 8, color: "#2e7d32" },
+            { id: "shizuoka", name: "靜岡", region: "中部", row: 9, col: 8, color: "#2e7d32" },
+            { id: "aichi", name: "愛知", region: "中部", row: 9, col: 7, color: "#2e7d32" },
+            
+            { id: "shiga", name: "滋賀", region: "近畿", row: 8, col: 6, color: "#b86214" },
+            { id: "mie", name: "三重", region: "近畿", row: 9, col: 6, color: "#b86214" },
+            { id: "kyoto", name: "京都", region: "近畿", row: 7, col: 5, color: "#b86214" },
+            { id: "osaka", name: "大阪", region: "近畿", row: 8, col: 5, color: "#00d2ff" },
+            { id: "hyogo", name: "兵庫", region: "近畿", row: 7, col: 4, color: "#b86214" },
+            { id: "nara", name: "奈良", region: "近畿", row: 9, col: 5, color: "#b86214" },
+            { id: "wakayama", name: "和歌山", region: "近畿", row: 10, col: 5, color: "#b86214" },
+            
+            { id: "tottori", name: "鳥取", region: "中國", row: 6, col: 4, color: "#c29d0b" },
+            { id: "shimane", name: "島根", region: "中國", row: 6, col: 3, color: "#c29d0b" },
+            { id: "okayama", name: "岡山", region: "中國", row: 8, col: 4, color: "#c29d0b" },
+            { id: "hiroshima", name: "廣島", region: "中國", row: 8, col: 3, color: "#c29d0b" },
+            { id: "yamaguchi", name: "山口", region: "中國", row: 8, col: 2, color: "#c29d0b" },
+            
+            { id: "kagawa", name: "香川", region: "四國", row: 9, col: 4, color: "#b04a29" },
+            { id: "tokushima", name: "德島", region: "四國", row: 10, col: 4, color: "#b04a29" },
+            { id: "ehime", name: "愛媛", region: "四國", row: 9, col: 3, color: "#b04a29" },
+            { id: "kochi", name: "高知", region: "四國", row: 10, col: 3, color: "#b04a29" },
+            
+            { id: "fukuoka", name: "福岡", region: "九州", row: 7, col: 2, color: "#6f3ab0" },
+            { id: "saga", name: "佐賀", region: "九州", row: 7, col: 1, color: "#6f3ab0" },
+            { id: "nagasaki", name: "長崎", region: "九州", row: 8, col: 1, color: "#6f3ab0" },
+            { id: "oita", name: "大分", region: "九州", row: 9, col: 2, color: "#6f3ab0" },
+            { id: "kumamoto", name: "熊本", region: "九州", row: 9, col: 1, color: "#6f3ab0" },
+            { id: "miyazaki", name: "宮崎", region: "九州", row: 10, col: 2, color: "#6f3ab0" },
+            { id: "kagoshima", name: "鹿兒島", region: "九州", row: 10, col: 1, color: "#6f3ab0" },
+            
+            { id: "okinawa", name: "沖繩", region: "沖繩", row: 12, col: 1, color: "#1679ab" }
+        ];
+
+        // --- 2. Complete 200 Achievements Data ---
+        const achievementsData = [
+            // 初心者 ★1 (IDs 1-20)
+            { id: 1, name: "看過富士山 🗻", desc: "親眼目睹象徵日本的神聖富士山壯麗輪廓。", diff: 1, rarity: "Common", cat: "自然", badgeId: "nationalpark" },
+            { id: 2, name: "搭過新幹線 🚄", desc: "體驗日本引以為傲的子彈列車，感受極速之旅。", diff: 1, rarity: "Common", cat: "交通", badgeId: "railfan" },
+            { id: 3, name: "吃過拉麵 🍜", desc: "品嚐一碗道地豚骨、醬油、味噌或鹽味日式拉麵。", diff: 1, rarity: "Common", cat: "美食" },
+            { id: 4, name: "吃過迴轉壽司 🍣", desc: "在迴轉軌道旁點餐並取下你最愛的鮮魚握壽司。", diff: 1, rarity: "Common", cat: "美食", badgeId: "sushi" },
+            { id: 5, name: "唐吉訶德購物 🛒", desc: "在深夜裡造訪驚安殿堂「唐吉訶德」大肆採購。", diff: 1, rarity: "Common", cat: "購物" },
+            { id: 6, name: "LAWSON 早餐 🍙", desc: "早起到 LAWSON 購買好吃的惡魔飯糰與炸雞片。", diff: 1, rarity: "Common", cat: "美食" },
+            { id: 7, name: "全家炸雞 🍗", desc: "品嚐全家超商大受歡迎的 Famichiki 脆皮多汁無骨炸雞。", diff: 1, rarity: "Common", cat: "美食" },
+            { id: 8, name: "Seven Premium 牛奶 🥛", desc: "在日本 7-11 超商購買濃郁的自有品牌高品質牛奶。", diff: 1, rarity: "Common", cat: "美食" },
+            { id: 9, name: "使用 Suica / ICOCA 💳", desc: "刷日本交通卡快速進出鐵路閘門或在超商付款結帳。", diff: 1, rarity: "Common", cat: "交通", badgeId: "railfan" },
+            { id: 10, name: "用日本自動販賣機 🥤", desc: "投幣點選一瓶日本街頭自動販賣機的冷熱飲。", diff: 1, rarity: "Common", cat: "購物" },
+            { id: 11, name: "用免治馬桶 🚽", desc: "體驗溫水沖洗與溫熱便座的日式廁所科技。", diff: 1, rarity: "Common", cat: "文化", badgeId: "culture" },
+            { id: 12, name: "神社抽御神籤 ⛩️", desc: "在日式神社或寺廟求一張占卜運勢的御神籤。", diff: 1, rarity: "Common", cat: "文化", badgeId: "shrine" },
+            { id: 13, name: "在便利商店買一整餐 🍱", desc: "挑選超商便當、義大利麵或三明治當作正式的一餐。", diff: 1, rarity: "Common", cat: "美食" },
+            { id: 14, name: "去過澀谷 🚦", desc: "穿越著名的澀谷站前十字路口，融入洶湧人潮。", diff: 1, rarity: "Common", cat: "攝影", badgeId: "anime" },
+            { id: 15, name: "去過心齋橋 🛍️", desc: "在大阪著名的心齋橋筋商店街逛街購物。", diff: 1, rarity: "Common", cat: "購物" },
+            { id: 16, name: "去過道頓堀 🐙", desc: "與標誌性的跑跑人 Glico 招牌拍照合照並大啖章魚燒。", diff: 1, rarity: "Common", cat: "美食" },
+            { id: 17, name: "去過淺草 🏮", desc: "參拜東京都最古老寺廟淺草寺，與巨大雷門紅燈籠拍照。", diff: 1, rarity: "Common", cat: "文化", badgeId: "shrine" },
+            { id: 18, name: "去過京都清水寺 🏯", desc: "俯瞰從陡峭山崖上以無釘工法架起的懸空清水舞台。", diff: 1, rarity: "Common", cat: "文化", badgeId: "shrine" },
+            { id: 19, name: "泡過溫泉 ♨️", desc: "在日本大眾浴池或湯屋脫光體驗暖心療癒的溫泉。", diff: 1, rarity: "Common", cat: "住宿", badgeId: "onsen" },
+            { id: 20, name: "穿浴衣 👘", desc: "換上舒適的日式棉質浴衣，踩上木屐輕鬆漫步。", diff: 1, rarity: "Common", cat: "文化", badgeId: "culture" },
+
+            // 旅人 ★★2 (IDs 21-50)
+            { id: 21, name: "使用 JR PASS 🚄", desc: "購買並兌換 JR 全國版或地方鐵路周遊券無限搭乘。", diff: 2, rarity: "Common", cat: "交通", badgeId: "railfan" },
+            { id: 22, name: "搭乘青春18 🚃", desc: "利用青春18車票，展開一段慢速火車的地方冒險之旅。", diff: 2, rarity: "Common", cat: "交通", badgeId: "railfan" },
+            { id: 23, name: "搭乘夜行巴士 🚌", desc: "搭乘通宵夜行長途巴士，在睡夢中移動跨越縣境。", diff: 2, rarity: "Common", cat: "交通" },
+            { id: 24, name: "搭乘地方普通車 (Local Train) 🚃", desc: "晃晃悠悠搭著站站停的慢速普通車，欣賞鐵路風光。", diff: 2, rarity: "Common", cat: "交通", badgeId: "railfan" },
+            { id: 25, name: "逛地方商店街 🏘️", desc: "拜訪大城市之外的地方特色有頂棚商店街，體驗在地生活。", diff: 2, rarity: "Common", cat: "購物" },
+            { id: 26, name: "造訪公路休息站 (Road Station) 🛣️", desc: "租車自駕或搭車途中拜訪「道の駅」，大啖在地土產與物產。", diff: 2, rarity: "Common", cat: "交通" },
+            { id: 27, name: "吃居酒屋 🏮", desc: "晚上走進日本小酒館，點生啤酒與烤雞串大肆聊天。", diff: 2, rarity: "Common", cat: "美食", badgeId: "sake" },
+            { id: 28, name: "在屋台用餐 🍜", desc: "在福岡博多等地的街邊屋台，圍坐在老闆前吃拉麵關東煮。", diff: 2, rarity: "Common", cat: "美食" },
+            { id: 29, name: "看煙火 🎆", desc: "在夏夜穿著浴衣，現場觀賞萬發絢爛盛開的花火大會。", diff: 2, rarity: "Common", cat: "祭典" },
+            { id: 30, name: "參與地方祭典 🏮", desc: "現場體驗充滿活力、抬著神轎叫喊的地方祭典（Matsuri）。", diff: 2, rarity: "Common", cat: "祭典", badgeId: "culture" },
+            { id: 31, name: "收集御朱印 📖", desc: "準備專用御朱印帳，請神社或寺廟的神職人員手寫朱印印記。", diff: 2, rarity: "Common", cat: "文化", badgeId: "shrine" },
+            { id: 32, name: "住町家 🏡", desc: "入住京都等地的百年木造傳統町家民宿，感受懷舊氛圍。", diff: 2, rarity: "Common", cat: "住宿" },
+            { id: 33, name: "住溫泉旅館 🛌", desc: "預訂一晚提供一泊二食精緻懷石料理的日式傳統溫泉旅館。", diff: 2, rarity: "Common", cat: "住宿", badgeId: "onsen" },
+            { id: 34, name: "賞楓 (紅葉巡禮) 🍁", desc: "在日本秋季尋訪漫山遍野、深淺交織的紅葉景致。", diff: 2, rarity: "Common", cat: "自然", badgeId: "momiji" },
+            { id: 35, name: "賞櫻 (櫻花收藏家) 🌸", desc: "在櫻花盛開的春日，與親友在櫻花樹下野餐聚會。", diff: 2, rarity: "Common", cat: "自然", badgeId: "sakura" },
+            { id: 36, name: "造訪白川鄉合掌村 🏡", desc: "親眼目睹童話故事般、陡峭人字形草頂的合掌造屋舍群。", diff: 2, rarity: "Common", cat: "自然", badgeId: "nationalpark" },
+            { id: 37, name: "走過千本鳥居 ⛩️", desc: "漫步在京都伏見稻荷大社那望不到盡頭的紅色鳥居隧道。", diff: 2, rarity: "Common", cat: "文化", badgeId: "shrine" },
+            { id: 38, name: "參觀日本城堡 🏯", desc: "造訪保存至今的古老天守，沿著極陡的木梯登高望遠。", diff: 2, rarity: "Common", cat: "文化", badgeId: "castle" },
+            { id: 39, name: "觀賞日本庭園 🎋", desc: "在名園裡靜坐，欣賞枯山水或池泉迴遊式的美學設計。", diff: 2, rarity: "Common", cat: "文化", badgeId: "culture" },
+            { id: 40, name: "造訪日本水族館 🐬", desc: "參觀擁有巨大水槽或精彩海豚表演的現代日本水族館。", diff: 2, rarity: "Common", cat: "自然", badgeId: "culture" },
+            { id: 41, name: "造訪日本動物園 🐼", desc: "造訪日本動物園，觀看活潑的動物或可愛的貓熊。", diff: 2, rarity: "Common", cat: "自然" },
+            { id: 42, name: "參觀日本美術館 🎨", desc: "欣賞日式當代或經典傳統畫作與雕刻雕塑藝術。", diff: 2, rarity: "Common", cat: "文化", badgeId: "culture" },
+            { id: 43, name: "參觀日本科學館 🚀", desc: "參觀互動性極強的日本科學博物館或未來科學館。", diff: 2, rarity: "Common", cat: "文化" },
+            { id: 44, name: "逛地方傳統市場 🥕", desc: "在地方早市或傳統市場，發掘充滿活力的日常生鮮蔬菜。", diff: 2, rarity: "Common", cat: "購物" },
+            { id: 45, name: "造訪地方漁港 ⚓", desc: "前往沿海地帶的小漁港，呼吸著帶有海鹹味的空氣。", diff: 2, rarity: "Common", cat: "自然", badgeId: "sushi" },
+            { id: 46, name: "吃海鮮市場海鮮丼 🍣", desc: "在海鮮市場親自挑選肥美海味，砌成滿滿一碗澎湃的海鮮丼。", diff: 2, rarity: "Common", cat: "美食", badgeId: "sushi" },
+            { id: 47, name: "造訪清晨魚市場 🐟", desc: "起個大早造訪魚市場，目睹新鮮漁獲交易的熱鬧情景。", diff: 2, rarity: "Common", cat: "美食", badgeId: "sushi" },
+            { id: 48, name: "逛百貨地下街 (Depachika) 🍰", desc: "在日本高端百貨公司地下食品街，被滿滿的高級便當甜點淹沒。", diff: 2, rarity: "Common", cat: "購物" },
+            { id: 49, name: "在 Loft 購物 📒", desc: "在 Loft 尋購極具創意與美感的日本手帳、文具與生活雜貨。", diff: 2, rarity: "Common", cat: "購物" },
+            { id: 50, name: "在 Tokyu Hands 購物 🛠️", desc: "在東急手創館尋找各種實用的日本手工工具或生活妙招小物。", diff: 2, rarity: "Common", cat: "購物" },
+
+            // 探索者 ★3 (IDs 51-95)
+            { id: 51, name: "踏上北海道土地 ❄️", desc: "來到日本最北的大地，呼吸北國獨特的開闊氣息。", diff: 3, rarity: "Rare", cat: "離島" },
+            { id: 52, name: "踏上東北土地 🌲", desc: "踏足隱匿於崇山峻嶺與自然溫泉間的純樸東北六縣。", diff: 3, rarity: "Rare", cat: "自然" },
+            { id: 53, name: "踏上北陸土地 🦀", desc: "造訪富山、石川、福井等面臨日本海、海產豐饒的地區。", diff: 3, rarity: "Rare", cat: "自然" },
+            { id: 54, name: "踏上山陰山陽 ⛩️", desc: "造訪本州最西端的中國地方，體會神話之鄉與瀨戶內風情。", diff: 3, rarity: "Rare", cat: "自然" },
+            { id: 55, name: "踏上四國土地 🌀", desc: "跨過大橋來到充滿大自然氣息與藝術之島的四國大島。", diff: 3, rarity: "Rare", cat: "離島" },
+            { id: 56, name: "踏上九州土地 🌋", desc: "來到溫泉鄉星羅棋布、火山景觀壯麗的南國九州大島。", diff: 3, rarity: "Rare", cat: "離島" },
+            { id: 57, name: "踏上沖繩土地 🏖️", desc: "來到陽光沙灘碧海包圍的沖繩群島，感受獨特琉球文化。", diff: 3, rarity: "Rare", cat: "離島", badgeId: "island" },
+            { id: 58, name: "造訪日本離島 🏝️", desc: "乘船離開本州或大島，探訪人口稀少但風光迷人的離島嶼。", diff: 3, rarity: "Rare", cat: "離島", badgeId: "island" },
+            { id: 59, name: "登上日本百名城 🏯", desc: "攻克由財團法人日本城郭協會所認定的百大名城之一。", diff: 3, rarity: "Rare", cat: "文化", badgeId: "castle" },
+            { id: 60, name: "參觀世界遺產 🏛️", desc: "朝聖日本登錄聯合國教科文組織的文化或自然世界遺產。", diff: 3, rarity: "Rare", cat: "文化", badgeId: "culture" },
+            { id: 61, name: "制霸日本三景 🗺️", desc: "造訪松島、天橋立或宮島，收服日本自江戶時代流傳的三大美景。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "nationalpark" },
+            { id: 62, name: "行走四國遍路 🚶", desc: "追隨弘法大師腳步，踏上朝聖四國八十八處靈場的遍路之道。", diff: 3, rarity: "Rare", cat: "文化", badgeId: "shrine" },
+            { id: 63, name: "行經熊野古道 🌲", desc: "踏上世界遺產「熊野古道」的神聖參拜古道，洗滌心靈。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "shrine" },
+            { id: 64, name: "立山黑部雪之大谷 ❄️", desc: "春季橫越立山黑部，行走在高聳垂直的巨型雪牆峽谷中。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "snow" },
+            { id: 65, name: "漫步上高地大正池 🏔️", desc: "漫步在神降臨之地的上高地，拍攝大正池中的枯木倒影與雪山。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "nationalpark" },
+            { id: 66, name: "徒步尾瀨濕原 🌾", desc: "漫步在群山環抱的高山沼澤濕原，踩在長長木棧道上看水芭蕉。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "nationalpark" },
+            { id: 67, name: "造訪知床半島 🦌", desc: "遠赴北海道知床半島，搭船觀賞棕熊或行走知床五湖。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "nationalpark" },
+            { id: 68, name: "造訪屋久島 🌲", desc: "深入森林，尋訪數千年樹齡的繩文杉，朝聖宮崎駿筆下的青苔森林。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "nationalpark" },
+            { id: 69, name: "走進白神山地 🌳", desc: "探訪世界最大的山毛櫸原始森林，觀賞神祕幽靜的青池。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "nationalpark" },
+            { id: 70, name: "眺望阿蘇火山 🌋", desc: "站在世界最大級破火山口的阿蘇山，俯瞰白煙裊裊的中岳火山口。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "nationalpark" },
+            { id: 71, name: "造訪櫻島活火山 🌋", desc: "隔著錦江灣眺望鹿兒島的精神象徵，或搭渡輪近距離感受火山灰。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "nationalpark" },
+            { id: 72, name: "攀登大雪山 🏔️", desc: "攀登北海道大雪山國立公園的主峰旭岳，迎接日本最早的秋天紅葉。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "nationalpark" },
+            { id: 73, name: "漫遊能登半島 🌊", desc: "探訪石川縣向日本海延伸的能登半島，體會千枚田與梯田風光。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "onsen" },
+            { id: 74, name: "遊覽瀨戶內海 🛳️", desc: "在瀨戶內海群島中吹著海風，欣賞平靜溫暖的海面與海上大橋。", diff: 3, rarity: "Rare", cat: "離島", badgeId: "island" },
+            { id: 75, name: "參拜嚴島神社大鳥居 ⛩️", desc: "退潮時步行到聳立在海泥中的巨大宮島朱紅鳥居旁親手觸摸。", diff: 3, rarity: "Rare", cat: "文化", badgeId: "shrine" },
+            { id: 76, name: "開車跨越角島大橋 🚗", desc: "自駕疾馳在藍色翡翠海中央的山口縣角島大橋上，畫面極度療癒。", diff: 3, rarity: "Rare", cat: "攝影" },
+            { id: 77, name: "泛舟高千穗峽 🛶", desc: "在陡峭的玄武岩斷崖火山峽谷中划船，從真名井瀑布正下方穿過。", diff: 3, rarity: "Rare", cat: "自然" },
+            { id: 78, name: "漫步銀山溫泉雪景 ❄️", desc: "大雪紛飛的冬夜，看著兩側大正時代木造旅館瓦斯燈點亮的夢幻景色。", diff: 3, rarity: "Rare", cat: "攝影", badgeId: "onsen" },
+            { id: 79, name: "觀賞藏王樹冰 ☃️", desc: "冬天搭乘纜車登上東北藏王，觀賞被冰雪緊緊包裹、造型千奇百怪的「雪怪」樹冰。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "snow" },
+            { id: 80, name: "搭乘鄂霍次克海流冰船 🚢", desc: "冬日遠赴北海道網走或紋別，搭乘破冰船撞碎並擠過海面厚重的漂浮流冰。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "snow" },
+            { id: 81, name: "搭乘 SL 蒸汽火車 🚂", desc: "搭乘噴發著滾滾黑煙、拉響汽笛的舊時代 SL 蒸汽機關車。", diff: 3, rarity: "Rare", cat: "交通", badgeId: "railfan" },
+            { id: 82, name: "搭乘地方私鐵 🚃", desc: "搭乘非 JR 系統的地方支線小火車，慢節奏穿梭於鄉間小路。", diff: 3, rarity: "Rare", cat: "交通", badgeId: "railfan" },
+            { id: 83, name: "搭乘內海渡輪 ⛴️", desc: "坐上大型客運渡輪橫越內海灣，享受悠閒海上時光。", diff: 3, rarity: "Rare", cat: "交通", badgeId: "island" },
+            { id: 84, name: "搭乘高空纜車 (Ropeway) 🚡", desc: "搭纜車翻山越嶺，從半空中眺望險峻的山谷或絕美海灣。", diff: 3, rarity: "Rare", cat: "交通" },
+            { id: 85, name: "搭乘滑雪場空中吊椅 ⛷️", desc: "乘著雙人或單人吊椅 Ski Lift 攀往雪山頂端，腳下是茫茫雪世界。", diff: 3, rarity: "Rare", cat: "交通", badgeId: "snow" },
+            { id: 86, name: "吉野山賞萬本櫻 🌸", desc: "春天站在吉野山展望台，眺望由三萬株櫻花將整座山谷染成粉紅的壯觀一目千本。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "sakura" },
+            { id: 87, name: "造訪嵐山賞楓名所 🍁", desc: "秋天漫步在京都嵐山渡月橋旁，看著漫山紅葉掩映著古樸寺廟。", diff: 3, rarity: "Rare", cat: "自然", badgeId: "momiji" },
+            { id: 88, name: "拍下京都金閣寺倒影 📷", desc: "在晴天造訪金閣寺，按下快門捕捉金色閣樓映照在鏡湖池的絕美倒影。", diff: 3, rarity: "Rare", cat: "攝影" },
+            { id: 89, name: "參觀姬路城（白鷺城） 🏯", desc: "造訪日本保存最完好的現存十二天守之首、潔白如天鵝展翅的國寶姬路城。", diff: 3, rarity: "Rare", cat: "文化", badgeId: "castle" },
+            { id: 90, name: "登上東京晴空塔 🗼", desc: "站在世界最高自立式電波塔展望台，將東京都心一覽無遺的繁華夜景盡收眼底。", diff: 3, rarity: "Rare", cat: "攝影" },
+            { id: 91, name: "鐮倉高校平交道拍照 🚉", desc: "在鐮倉江之電平交道旁駐足拍照，朝聖動漫《灌籃高手》的熱血經典畫面。", diff: 3, rarity: "Rare", cat: "攝影", badgeId: "anime" },
+            { id: 92, name: "拜訪熊本城 🏯", desc: "參觀築城名將加藤清正建造、以堅固石牆「武者返」聞名的雄偉黑色熊本城。", diff: 3, rarity: "Rare", cat: "文化", badgeId: "castle" },
+            { id: 93, name: "造訪日光東照宮 🏯", desc: "拜訪德川家康的靈廟，欣賞金碧輝煌的雕刻，尋找著名的「三猿」與「眠貓」。", diff: 3, rarity: "Rare", cat: "文化", badgeId: "shrine" },
+            { id: 94, name: "沖繩美麗海看豆腐鯊 🐋", desc: "站在巨大「黑潮之海」水槽前，靜靜看著巨大鯨鯊在藍色海水中優雅游動。", diff: 3, rarity: "Rare", cat: "自然" },
+            { id: 95, name: "參觀廣島和平紀念公園 🕊️", desc: "親臨原子彈爆炸圓頂屋遺址前，悼念歷史，體會和平的可貴價值。", diff: 3, rarity: "Rare", cat: "文化" },
+
+            // 日本迷 ★4 (IDs 96-145)
+            { id: 96, name: "體驗正統日式茶道 🍵", desc: "在茶室中看茶師優雅點茶，並雙手端起微苦的抹茶一飲而盡。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
+            { id: 97, name: "動手製作和菓子 🍡", desc: "跟隨師傅捏製精緻、四季色彩分明的傳統日式和菓子。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
+            { id: 98, name: "參觀清酒酒藏並品酒 🍶", desc: "深入古老酒廠參觀發酵桶，學習精米步合，並品嚐各款新鮮釀造的清酒。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "sake" },
+            { id: 99, name: "參觀威士忌蒸餾廠 🥃", desc: "拜訪山崎、余市或白州等蒸餾所，了解日式單一麥芽威士忌工藝並試飲。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "sake" },
+            { id: 100, name: "親手製作日本陶藝 🏺", desc: "在拉胚機上親手塑形，體驗日本備前燒或有田燒的窯烤工藝魅力。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
+            { id: 101, name: "體驗傳統日式染布 🎨", desc: "親手染製布料，感受日本藍染（Aizome）散發出的沈靜和風之美。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 102, name: "觀摩或體驗劍道 ⚔️", desc: "換上劍道服防具，學習竹刀劈擊，感受日本武士道的精髓氣場。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 103, name: "觀摩或體驗弓道 🏹", desc: "屏氣凝神，拉開巨大的日本和弓，體驗日本禪意滿滿的弓道射擊精神。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 104, name: "在寺廟體驗坐禪 🧘", desc: "清晨在佛堂中盤腿靜坐，拋開雜念，被高僧以警策木板拍打雙肩警醒。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 105, name: "入住寺院宿坊 🛏️", desc: "在佛教聖地高野山等地入住寺廟宿舍，體驗素食精進料理與早課抄經。", diff: 4, rarity: "Epic", cat: "住宿", badgeId: "shrine" },
+            { id: 106, name: "現場觀看歌舞伎劇目 🎭", desc: "前往東京歌舞伎座，觀看畫著華麗妝容的演員表演日本傳統的歌舞伎劇目。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
+            { id: 107, name: "欣賞日本能劇表演 🎭", desc: "觀賞戴著神秘木雕面具、身穿寬大禮服，動作緩慢而莊嚴的古代能劇。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
+            { id: 108, name: "觀看日本傳統文樂木偶劇 🎭", desc: "看三位操偶師精準合力操作一具精巧的木偶，演出古典人情淨琉璃故事。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 109, name: "現場觀看相撲大賽 🤼", desc: "親臨兩國國技館，觀看兩名大力士在土俵上展開力量與技巧的相撲決鬥。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
+            { id: 110, name: "去阪神甲子園看棒球 ⚾", desc: "在日本棒球聖地甲子園現場感受高中聯賽的青春熱血或職棒的狂熱應援。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
+            { id: 111, name: "現場看一場 J League ⚽", desc: "走進足球體育場，為心儀的日本職業足球聯盟隊伍現場高聲吶喊應援。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 112, name: "看 NPB 日本職棒賽 ⚾", desc: "在日本巨蛋或露天球場觀賞一場熱鬧的日本職棒賽，大口嚼便當喝啤酒。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
+            { id: 113, name: "去日本賽馬場投注 🏇", desc: "前往東京或京都賽馬場，填寫投注單，體驗群馬奔騰、全場歡呼的心跳快感。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 114, name: "現場觀看日本競艇 🚤", desc: "站在水池邊觀看極速快艇在水面上急轉彎，水花四濺的熱血競速比賽。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 115, name: "現場觀看日本競輪 🚴", desc: "觀看高水準自行車場地賽，選手在大轉彎車道上展開近距離激烈卡位肉搏。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 116, name: "支持地方偶像表演 🎤", desc: "前往地方小型舞台或地下劇場，現場應援極具親切感的地方偶像少女團體。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "anime" },
+            { id: 117, name: "去 Live House 聽演出 🎸", desc: "擠入狹小的地下 Live House，站在音響前感受日本獨立樂團震撼的樂音與汗水。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "anime" },
+            { id: 118, name: "參加動漫演唱會/Anisong 🎵", desc: "揮舞著螢光棒，在萬人體育場大合唱你最愛的動畫經典主題曲。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "anime" },
+            { id: 119, name: "參加 Comic Market 🎒", desc: "闖入全世界最大型的同人誌即售會 Comic Market (Comiket) 現場人擠人。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "anime" },
+            { id: 120, name: "參加地方同人誌即售會 📚", desc: "參加東京以外的地方小型同人活動，發掘隱藏的原創作品與愛好者社群。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 121, name: "前往動漫聖地進行巡禮 🗺️", desc: "親自造訪動畫作品中的現實取景地，比對動畫畫面拍下同角度對比照。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "anime" },
+            { id: 122, name: "吃過 10 種不同的鐵路便當 🍱", desc: "收集並品嚐 10 個日本各地區以精緻木盒包裝、展現在地食材的冷食火車便當。", diff: 4, rarity: "Epic", cat: "美食", badgeId: "railfan" },
+            { id: 123, name: "搭乘寢台列車 (如 SUNRISE) 🛌", desc: "體驗日本僅存的定期夜行豪華寢台火車，在搖晃的包廂中過夜。", diff: 4, rarity: "Epic", cat: "交通", badgeId: "railfan" },
+            { id: 124, name: "搭乘主題觀光列車 🚃", desc: "搭乘車廂內裝精美、設有景觀窗與在地餐飲服務的主題觀光火車（Joyful Train）。", diff: 4, rarity: "Epic", cat: "交通", badgeId: "railfan" },
+            { id: 125, name: "搭乘過 SL 人吉 🚂", desc: "曾搭乘已引退的九州人氣木造蒸汽老火車「SL 人吉」，噴吐黑煙跨越球磨川鐵橋。", diff: 4, rarity: "Epic", cat: "交通", badgeId: "railfan" },
+            { id: 126, name: "搭乘 SUNRISE 列車 🛌", desc: "搭乘「日出瀨戶號」或「日出出雲號」從東京一路出發到四國或山陰地區。", diff: 4, rarity: "Epic", cat: "交通", badgeId: "railfan" },
+            { id: 127, name: "搭乘九州七星豪華列車 🌟", desc: "預約搭乘極致奢華的七星號巡遊九州，享受頂級管家服務與沿途美食饗宴。", diff: 4, rarity: "Epic", cat: "交通", badgeId: "railfan" },
+            { id: 128, name: "搭乘 TRAIN SUITE 四季島 🌟", desc: "乘著金色超未來風格觀光套房列車四季島，從東京出發暢遊東北與北海道。", diff: 4, rarity: "Epic", cat: "交通", badgeId: "railfan" },
+            { id: 129, name: "搭乘 TWILIGHT EXPRESS 瑞風 🌟", desc: "搭乘極致優雅的綠色瑞風號餐車列車，沿著山陰山陽線巡遊絕美海岸風景。", diff: 4, rarity: "Epic", cat: "交通", badgeId: "railfan" },
+            { id: 130, name: "日本郵局寄明信片回台 📮", desc: "買一張日本特色造型明信片，貼上郵票投入紅色郵筒順利寄回台灣家裡。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 131, name: "觀禮日本神前式婚禮 🎎", desc: "在明治神宮等大神社，偶遇並靜靜觀禮新娘穿著白無垢的傳統婚禮隊伍。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
+            { id: 132, name: "穿浴衣跳盆舞 🏮", desc: "在夏日祭典中融入當地居民，圍著高台高舉雙手跟著音樂節奏跳「盆踊」舞。", diff: 4, rarity: "Epic", cat: "祭典", badgeId: "culture" },
+            { id: 133, name: "參與札幌雪祭 ❄️", desc: "在寒冬拜訪大通公園，仰望數十公尺高、雕刻得栩栩如生的巨型動漫或古蹟冰雕。", diff: 4, rarity: "Epic", cat: "祭典", badgeId: "snow" },
+            { id: 134, name: "欣賞支笏湖冰濤祭 ❄️", desc: "觀賞抽取清澈湖水噴灑凍結而成的巨型湛藍冰雕，在夜晚燈光投射下五彩繽紛。", diff: 4, rarity: "Epic", cat: "祭典", badgeId: "snow" },
+            { id: 135, name: "造訪秋田竿燈祭 🌾", desc: "現場目睹男兒額頭、肩膀或腰間頂起掛滿無數亮晶晶紙燈籠的巨大竿燈隊伍。", diff: 4, rarity: "Epic", cat: "祭典", badgeId: "culture" },
+            { id: 136, name: "觀賞青森睡魔祭 👹", desc: "在群眾「Rassera!」的狂熱叫喊聲中，看著巨型發光睡魔燈籠在青森街頭遊行。", diff: 4, rarity: "Epic", cat: "祭典", badgeId: "culture" },
+            { id: 137, name: "造訪京都祇園祭 🏮", desc: "盛夏拜訪京都，觀看雄偉精緻的「山鉾」巡行，體會千年的京都祭典底韻。", diff: 4, rarity: "Epic", cat: "祭典", badgeId: "shrine" },
+            { id: 138, name: "現場觀看德島阿波舞 💃", desc: "看著舞者們一邊敲擊樂器一邊邁著獨特舞步，嘴裡唸著「傻瓜舞一回，不跳真吃虧」的奔放舞姿。", diff: 4, rarity: "Epic", cat: "祭典", badgeId: "culture" },
+            { id: 139, name: "造訪宮城仙台七夕祭 🎋", desc: "漫步在仙台市區高高懸掛、色彩極其豔麗的巨型紙花球與彩色千羽鶴竹幡林中。", diff: 4, rarity: "Epic", cat: "祭典" },
+            { id: 140, name: "參觀大曲全國花火競技 🎆", desc: "站在大曲河川敷，觀看全國花火大師頂尖對決、配合交響樂連發爆裂的頂級夜空秀。", diff: 4, rarity: "Epic", cat: "祭典" },
+            { id: 141, name: "拍攝小樽運河雪景 ❄️", desc: "寒冬雪夜，站在橋上拍下小樽運河水面漂浮的浮玉燭光，與紅磚倉庫上的積雪相映。", diff: 4, rarity: "Epic", cat: "攝影", badgeId: "snow" },
+            { id: 142, name: "富士芝櫻祭粉紅花海 🌸", desc: "春末拍下一整片如粉紅地毯鋪展的芝櫻，背後聳立著尚有積雪的富士山雄姿。", diff: 4, rarity: "Epic", cat: "攝影", badgeId: "sakura" },
+            { id: 143, name: "海濱公園藍色粉蝶花 🦋", desc: "春季造訪茨城國營常陸海濱公園，拍下山丘上無邊無際的港灣粉蝶花海。", diff: 4, rarity: "Epic", cat: "攝影", badgeId: "nationalpark" },
+            { id: 144, name: "足利公園紫藤花瀑布 🍇", desc: "春末仰望樹齡破百年的巨大紫藤架，拍下垂墜數公尺、如雨般落下的夢幻粉紫藤花幕。", diff: 4, rarity: "Epic", cat: "攝影", badgeId: "sakura" },
+            { id: 145, name: "拍下名港中央大橋夜景 🌉", desc: "在日落黃昏，架起腳架拍下名港中央大橋在深藍夜色中亮起彩燈的氣勢巨拱。", diff: 4, rarity: "Epic", cat: "攝影" },
+
+            // 修羅 ★5 (IDs 146-180)
+            { id: 146, name: "登頂富士山 🗻", desc: "戴上頭燈背起重裝，深夜行走火山碎石路，並成功登頂劍峰 3776m 迎御來光。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "nationalpark" },
+            { id: 147, name: "北海道冬季自駕遊 🚗", desc: "在北國茫茫大雪覆蓋、毫無路標的冰封路面上租車自駕暢遊。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "snow" },
+            { id: 148, name: "在雪道/結冰路面開車 ❄️", desc: "體驗車輛行經滑溜冰雪路面、車尾打滑時抓穩方向盤的手心出汗挑戰。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "snow" },
+            { id: 149, name: "在日本機場睡過一晚 ✈️", desc: "因深夜航班或誤點滯留，被迫蜷縮在機場候機大廳的長椅上過夜。", diff: 5, rarity: "Legendary", cat: "極限挑戰" },
+            { id: 150, name: "錯過終電在網咖過夜 💻", desc: "喝太晚或逛過頭錯過最後一班電車，只好在日式網咖隔間或膠囊旅館睡一晚。", diff: 5, rarity: "Legendary", cat: "極限挑戰" },
+            { id: 151, name: "遭遇颱風滯留日本 🌀", desc: "遇到強颱侵襲，航班停飛，被迫在旅館房內吃超商泡麵看電視新聞等待颱風離去。", diff: 5, rarity: "Legendary", cat: "極限挑戰" },
+            { id: 152, name: "遇到 JR 全線停駛 ❌", desc: "大雪或人身事故導致交通癱瘓，面對車站月台「運行停止」看板的不知所措。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "railfan" },
+            { id: 153, name: "旅行時遇過有感地震 🫨", desc: "在日本旅行時遭遇搖晃明顯的芮氏地震，手機響起刺耳的緊急地震速報警報。", diff: 5, rarity: "Legendary", cat: "極限挑戰" },
+            { id: 154, name: "日本寺廟敲鐘除夕初詣 🔔", desc: "除夕夜在大雪中排隊數小時，親手撞擊巨鐘迎接跨年，隨後進行新年第一次參拜。", diff: 5, rarity: "Legendary", cat: "祭典", badgeId: "shrine" },
+            { id: 155, name: "看新年的第一個日出 🌅", desc: "元旦清晨，在大地還被凍結的嚴寒中，等待初昇的太陽將第一道陽光灑向地平線。", diff: 5, rarity: "Legendary", cat: "自然" },
+            { id: 156, name: "體驗道地的日本新年 🎌", desc: "元旦品嚐精緻但冷食的「御節料理（Osechi）」，並到神社購買破魔矢祈福。", diff: 5, rarity: "Legendary", cat: "文化", badgeId: "culture" },
+            { id: 157, name: "排隊購買限量跨年福袋 🛍️", desc: "元旦清晨在百貨公司門口大排長龍，爭搶超值精美但內容未知的密封限量福袋。", diff: 5, rarity: "Legendary", cat: "購物" },
+            { id: 158, name: "搶到日本熱門演唱會票 🎟️", desc: "註冊日本複雜的抽選會員系統，順利在競爭激烈的抽票機制中贏得夢幻門票。", diff: 5, rarity: "Legendary", cat: "文化", badgeId: "anime" },
+            { id: 159, name: "抽中寶可夢中心整理券 👾", desc: "在日本 Pokemon Center 開幕或熱門活動時，順利在線上或現場抽中入場整理券。", diff: 5, rarity: "Legendary", cat: "購物", badgeId: "anime" },
+            { id: 160, name: "吃過日本米其林三星 🍽️", desc: "提早數個月預定並穿著正式服裝，享用一頓精湛優雅、價格不菲的日本米其林三星盛宴。", diff: 5, rarity: "Legendary", cat: "美食", badgeId: "sushi" },
+            { id: 161, name: "入住星野集團旗下飯店 🏨", desc: "入住奢華與地方特色完美融合的星野集團（Hoshino Resorts）旗下精品旅館。", diff: 5, rarity: "Legendary", cat: "住宿" },
+            { id: 162, name: "入住頂級虹夕諾雅 🛌", desc: "入住星野極致奢華系列的「虹夕諾雅（Hoshinoya）」，沉浸於遠離塵囂的非日常世界。", diff: 5, rarity: "Legendary", cat: "住宿" },
+            { id: 163, name: "入住星野「界」溫泉飯店 ♨️", desc: "入住精緻的日式精品溫泉旅館「界（KAI）」系列，享受精緻餐點與極致日式溫泉饗宴。", diff: 5, rarity: "Legendary", cat: "住宿", badgeId: "onsen" },
+            { id: 164, name: "體驗一人的燒肉 🥩", desc: "隻身走進設有個人烤網的燒肉店，不受任何人干擾、全神貫注享受烤每一片肉的時光。", diff: 5, rarity: "Legendary", cat: "美食" },
+            { id: 165, name: "隻身挑戰地方傳統居酒屋 🏮", desc: "鼓起勇氣獨自拉開全是常客的深夜居酒屋暖簾，用日文向板前老闆點烤串清酒。", diff: 5, rarity: "Legendary", cat: "美食", badgeId: "sake" },
+            { id: 166, name: "尋訪日本秘湯 ♨️", desc: "拜訪由日本秘湯協會認證、深藏在人跡罕至的峽谷或山林深處的古老溫泉池。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "onsen" },
+            { id: 167, name: "體驗日本傳統男女混浴 ♨️", desc: "在歷史悠久的古老溫泉池，克服羞澀心理，與當地人一起浸泡在同一個乳白色大池中。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "onsen" },
+            { id: 168, name: "浸泡野外天然野湯 ♨️", desc: "跋山涉水甚至要動手挖掘沙地，在野外天然溪流旁完全無人看管的溫泉池中泡湯。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "onsen" },
+            { id: 169, name: "離島間進行跳島旅行 🛳️", desc: "規劃船班時刻，在沖繩、瀨戶內海或長崎離島群間，一天內搭乘多次渡輪往返跳島。", diff: 5, rarity: "Legendary", cat: "離島", badgeId: "island" },
+            { id: 170, name: "踏上佐渡島 🏝️", desc: "渡過海峽踏上新潟縣的巨大佐渡島，觀看古老金山遺址，體驗盆舟劃行。", diff: 5, rarity: "Legendary", cat: "離島", badgeId: "island" },
+            { id: 171, name: "踏上利尻島/禮文島 🏝️", desc: "遠涉北海道最北端的利尻山浮海孤島，或被野花覆蓋的禮文島步道健行。", diff: 5, rarity: "Legendary", cat: "離島", badgeId: "island" },
+            { id: 172, name: "踏上最西端：與那國島 🏝️", desc: "在天氣晴朗時踏上與那國島西崎，向西眺望隱約可見的台灣中央山脈山影。", diff: 5, rarity: "Legendary", cat: "離島", badgeId: "island" },
+            { id: 173, name: "24小時渡輪造訪小笠原群島 ⛴️", desc: "忍受一整天無網路訊號的大洋顛簸，搭乘長途渡輪遠涉孤懸於南太平洋的秘境小笠原世界遺產。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "island" },
+            { id: 174, name: "日本四極點制霸 🧭", desc: "收集並集齊日本本土最東（納沙布岬）、最西（神崎鼻）、最南（佐多岬）、最北（宗谷岬）四端點證書。", diff: 5, rarity: "Legendary", cat: "極限挑戰" },
+            { id: 175, name: "47都道府縣足跡制霸 🗺️", desc: "達成解鎖壯舉，親自踏上並打卡日本全部 47 個都道府縣的土地。", diff: 5, rarity: "Legendary", cat: "極限挑戰" },
+            { id: 176, name: "泡完日本三大古湯 ♨️", desc: "浸泡過神話時代即流傳至今的日本三大古溫泉：有馬溫泉、道後溫泉以及白濱溫泉。", diff: 5, rarity: "Legendary", cat: "住宿", badgeId: "onsen" },
+            { id: 177, name: "參拜完四國八十八處靈場 🚶", desc: "完成全程 1200 公里的朝聖之旅，集齊全部 88 家遍路寺廟的御朱印帳。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "shrine" },
+            { id: 178, name: "攀登日本三大靈山 🧗", desc: "成功征服並踏足日本自古尊崇的三大靈山：富士山、立山以及白山頂峰。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "nationalpark" },
+            { id: 179, name: "造訪日本三大秘境 🌲", desc: "探訪深藏山谷中的三大絕密秘境：白川鄉、德島祖谷溪以及宮崎椎葉村。", diff: 5, rarity: "Legendary", cat: "自然", badgeId: "nationalpark" },
+            { id: 180, name: "達成日本100名城全部登城 🏯", desc: "歷經數年旅程，走遍並蓋齊日本 100 大歷史名城的專屬集章本。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "castle" },
+
+            // 隱藏成就 ★6 (IDs 181-200)
+            { id: 181, name: "👑 鹿仙貝守護者 🦌", desc: "成功餵食奈良梅花鹿且全身而退，未被鹿群追趕、咬衣服或頂撞。", diff: 6, rarity: "Legendary", cat: "美食", hidden: true },
+            { id: 182, name: "🍙 超商人生 🏪", desc: "在日本旅行期間連續三餐都吃便利商店便當泡麵解決。", diff: 6, rarity: "Legendary", cat: "美食", hidden: true },
+            { id: 183, name: "🚄 鐵道狂 🎫", desc: "在單一曆日內，搭乘超過 8 班不同線路或名稱的鐵路列車。", diff: 6, rarity: "Legendary", cat: "交通", badgeId: "railfan", hidden: true },
+            { id: 184, name: "♨️ 溫泉猴 🐒", desc: "在單一曆日內泡湯 3 次以上（包含公共大眾湯、旅館內湯與路邊足湯）。", diff: 6, rarity: "Legendary", cat: "極限挑戰", badgeId: "onsen", hidden: true },
+            { id: 185, name: "📮 日本郵便 📬", desc: "從日本寄送的明信片，橫跨大海順利寄達你的家鄉地址。", diff: 6, rarity: "Legendary", cat: "文化", hidden: true },
+            { id: 186, name: "🎌 日本人？ 🗣️", desc: "全程被日本店員以流利日文溝通，無切換英文或指著手指翻譯卡。", diff: 6, rarity: "Legendary", cat: "文化", badgeId: "culture", hidden: true },
+            { id: 187, name: "啤酒與終電 🍺", desc: "夜生活太嗨錯過最後一班電車，被迫在街頭徘徊或找 24 小時便利店過夜。", diff: 6, rarity: "Legendary", cat: "極限挑戰", hidden: true },
+            { id: 188, name: "🗾 完全制霸 🎌", desc: "47 個都道府縣的足跡全部在地圖上點選為已拜訪狀態。", diff: 6, rarity: "Legendary", cat: "極限挑戰", hidden: true },
+            { id: 189, name: "💸 破產危機 👛", desc: "在日本旅行時，皮夾裡的日圓現金全部花光，只剩信用卡跟IC交通卡撐到最後。", diff: 6, rarity: "Legendary", cat: "購物", hidden: true },
+            { id: 190, name: "🦆 鴨川等間隔 🌊", desc: "在京都鴨川河床旁坐下時，與左右群眾保持完美的日式「等間隔距離」。", diff: 6, rarity: "Legendary", cat: "文化", hidden: true },
+            { id: 191, name: "🍣 壽司狂熱 🍣", desc: "連續三天中，每天至少有一餐是吃握壽司、海鮮丼或手卷壽司度過。", diff: 6, rarity: "Legendary", cat: "美食", badgeId: "sushi", hidden: true },
+            { id: 192, name: "🐈 貓島島民 🐱", desc: "拜訪日本貓島（如愛媛青島、宮城田代島），並被大量毛茸茸的貓咪圍繞。", diff: 6, rarity: "Legendary", cat: "離島", badgeId: "island", hidden: true },
+            { id: 193, name: "🗼 雙塔制霸 📸", desc: "在同一天之內同時登上東京鐵塔與東京晴空塔，收集完雙重地標視角。", diff: 6, rarity: "Legendary", cat: "極限挑戰", hidden: true },
+            { id: 194, name: "🎰 柏青哥新手 🍒", desc: "第一次踏入充斥著巨大鋼珠噪音與煙味的柏青哥店並嘗試體驗了一次。", diff: 6, rarity: "Legendary", cat: "文化", hidden: true },
+            { id: 195, name: "🎒 獨行俠 🚶", desc: "挑戰成功一個人完成長達數天、完全無旅伴的日本獨自鐵道或自駕慢遊。", diff: 6, rarity: "Legendary", cat: "住宿", hidden: true },
+            { id: 196, name: "🍜 拉麵二郎巡禮 🐷", desc: "成功挑戰並吃完一整碗「拉麵二郎」加厚叉燒與蔬菜大碗，感受到二郎神教的洗禮。", diff: 6, rarity: "Legendary", cat: "美食", hidden: true },
+            { id: 197, name: "🏰 迪士尼雙園制霸 🎢", desc: "在同一次日本旅程中，同時玩遍東京迪士尼樂園與東京迪士尼海洋兩大樂園。", diff: 6, rarity: "Legendary", cat: "文化", hidden: true },
+            { id: 198, name: "👹 生剝鬼遭遇 👹", desc: "在秋田親眼見到並體驗傳統的「生剝鬼（Namahage）」儀式，被吼叫恐嚇嚇壞。", diff: 6, rarity: "Legendary", cat: "祭典", hidden: true },
+            { id: 199, name: "🥛 牛奶大滿貫 🍼", desc: "在便利商店一次買齊三大巨頭（Lawson, FamilyMart, 7-11）的自有品牌牛乳並全部喝完。", diff: 6, rarity: "Legendary", cat: "美食", hidden: true },
+            { id: 200, name: "⛩️ 鳥居海景 🌊", desc: "造訪山口縣元乃隅神社或茨城縣大洗磯前神社，拍下海上白色/朱紅鳥居被巨浪拍打的震撼照片。", diff: 6, rarity: "Legendary", cat: "攝影", badgeId: "shrine", hidden: true }
+        ];
+
+        // --- 3. App State Variables ---
+        let appState = {
+            playerName: "日本探險家",
+            playerAvatar: "🥋",
+            checkedAchievements: [],
+            visitedPrefectures: [],
+            theme: "dark"
+        };
+
+        let activeFilters = {
+            search: "",
+            diff: "all",
+            rarity: "all",
+            status: "all",
+            badge: "all"
+        };
+
+        // --- 4. Web Audio Synthesizer (Retro beep chime) ---
+        let audioCtx = null;
+        function playChime() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const now = audioCtx.currentTime;
+                
+                // Play a pleasant game-like arpeggio (C5 -> E5 -> G5 -> C6)
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                osc.type = 'triangle';
+                
+                const freqs = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                freqs.forEach((freq, idx) => {
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                });
+                
+                gainNode.gain.setValueAtTime(0.12, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.start(now);
+                osc.stop(now + 0.6);
+            } catch (e) {
+                console.warn("Audio Context blocked or unsupported:", e);
+            }
+        }
+
+        // --- 5. Particles Confetti System ---
+        let confettiActive = false;
+        let confettiParticles = [];
+        const confettiColors = ['#ff003c', '#00d2ff', '#ffd700', '#00ff87', '#9d4edd', '#ff85a2'];
+
+        function triggerConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            confettiParticles = [];
+            for (let i = 0; i < 80; i++) {
+                confettiParticles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height * 0.75, // Burst from slightly lower
+                    vx: (Math.random() - 0.5) * 18,
+                    vy: -Math.random() * 18 - 8,
+                    r: Math.random() * 5 + 3,
+                    color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+                    alpha: 1,
+                    gravity: 0.4,
+                    decay: Math.random() * 0.02 + 0.015
+                });
+            }
+            
+            if (!confettiActive) {
+                confettiActive = true;
+                requestAnimationFrame(updateConfetti);
+            }
+        }
+
+        function updateConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let active = false;
+            confettiParticles.forEach(p => {
+                if (p.alpha > 0) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += p.gravity;
+                    p.alpha -= p.decay;
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    active = true;
+                }
+            });
+            
+            ctx.globalAlpha = 1.0;
+            if (active) {
+                requestAnimationFrame(updateConfetti);
+            } else {
+                confettiActive = false;
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('confettiCanvas');
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
+
+        // --- 6. Steam Style Notifications Queue ---
+        let toastQueue = [];
+        let isShowingToast = false;
+
+        function showNotification(title, desc, emoji) {
+            toastQueue.push({ title, desc, emoji });
+            processToastQueue();
+        }
+
+        function processToastQueue() {
+            if (isShowingToast || toastQueue.length === 0) return;
+            isShowingToast = true;
+
+            const item = toastQueue.shift();
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `
+                <div class="toast-icon">${item.emoji}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${item.title}</div>
+                    <div class="toast-desc">${item.desc}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            playChime();
+            triggerConfetti();
+
+            setTimeout(() => {
+                toast.classList.add('hide');
+                toast.addEventListener('animationend', () => {
+                    toast.remove();
+                    isShowingToast = false;
+                    setTimeout(processToastQueue, 100);
+                });
+            }, 3000);
+        }
+
+        // --- 7. LocalStorage and State Management ---
+        function saveState() {
+            localStorage.setItem('japan_travel_achievements_state', JSON.stringify(appState));
+        }
+
+        function loadState() {
+            const data = localStorage.getItem('japan_travel_achievements_state');
+            if (data) {
+                try {
+                    const parsed = JSON.parse(data);
+                    appState = { ...appState, ...parsed };
+                } catch (e) {
+                    console.error("Failed to load local storage state:", e);
+                }
+            }
+            
+            // Apply theme
+            document.documentElement.setAttribute('data-theme', appState.theme);
+            updateThemeButtonUI();
+
+            // Profile info
+            document.getElementById('playerName').value = appState.playerName;
+            document.getElementById('playerAvatar').textContent = appState.playerAvatar;
+        }
+
+        function resetProgress() {
+            if (confirm("⚠️ 確定要重置所有旅遊成就與都道府縣足跡嗎？此動作無法復原！")) {
+                appState.checkedAchievements = [];
+                appState.visitedPrefectures = [];
+                saveState();
+                updateUI();
+                showNotification("進度重置", "已清除所有勾選記錄", "🔄");
+            }
+        }
+
+        function exportData() {
+            const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `japan_travel_achievements_${appState.playerName}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed.checkedAchievements) && Array.isArray(parsed.visitedPrefectures)) {
+                        appState = { ...appState, ...parsed };
+                        saveState();
+                        updateUI();
+                        showNotification("導入成功", "你的旅遊進度已完全恢復", "📥");
+                    } else {
+                        alert("檔案格式不正確，請匯入本系統產出的 JSON 備份檔。");
+                    }
+                } catch (err) {
+                    alert("讀取檔案出錯，請確認檔案格式是否正確。");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- 8. Level & Title System ---
+        function getLevelDetails(count) {
+            let title = "🌱 日本新手";
+            let level = Math.floor(count / 10);
+            
+            if (count >= 0 && count <= 10) title = "🌱 日本新手";
+            else if (count >= 11 && count <= 30) title = "🎒 自助旅行者";
+            else if (count >= 31 && count <= 60) title = "✈ 日本探索家";
+            else if (count >= 61 && count <= 90) title = "🗾 日本達人";
+            else if (count >= 91 && count <= 120) title = "🎌 日本專家";
+            else if (count >= 121 && count <= 150) title = "👑 日本國民 (誤)";
+            else if (count > 150) title = "🏯 日本旅行神";
+            
+            return { title, level };
+        }
+
+        // --- 9. Badge Wall Logic ---
+        function getBadgeProgress(badgeId) {
+            const badge = badgeData.find(b => b.id === badgeId);
+            if (!badge) return { unlocked: false, count: 0, total: 0 };
+            
+            // Filter all achievements linked to this badge
+            const targetAchs = achievementsData.filter(a => a.badgeId === badgeId);
+            const completedCount = targetAchs.filter(a => appState.checkedAchievements.includes(a.id)).length;
+            
+            return {
+                unlocked: completedCount >= badge.threshold,
+                count: completedCount,
+                total: badge.threshold
+            };
+        }
+
+        // --- 10. Prefectures Map Rendering & Logic ---
+        function renderMap() {
+            const mapContainer = document.getElementById('japanPrefMap');
+            if (!mapContainer) return;
+            mapContainer.innerHTML = '';
+
+            // Draw cells based on Grid Row / Col
+            prefecturesData.forEach(pref => {
+                const cell = document.createElement('div');
+                cell.className = 'pref-cell';
+                if (appState.visitedPrefectures.includes(pref.id)) {
+                    cell.classList.add('visited');
+                }
+                
+                cell.textContent = pref.name.substring(0, 2);
+                cell.style.gridRow = `${pref.row} / span ${pref.rowSpan || 1}`;
+                cell.style.gridColumn = `${pref.col} / span ${pref.colSpan || 1}`;
+                cell.style.backgroundColor = pref.color + '22';
+                cell.style.borderColor = pref.color;
+                
+                cell.onclick = () => togglePrefecture(pref.id);
+                mapContainer.appendChild(cell);
+            });
+
+            // Draw region widgets
+            renderRegionProgress();
+        }
+
+        function togglePrefecture(prefId) {
+            const idx = appState.visitedPrefectures.indexOf(prefId);
+            const prefObj = prefecturesData.find(p => p.id === prefId);
+            
+            if (idx === -1) {
+                appState.visitedPrefectures.push(prefId);
+                showNotification("拜訪打卡", `已新增到訪足跡：${prefObj.name}`, "📍");
+            } else {
+                appState.visitedPrefectures.splice(idx, 1);
+            }
+            
+            // Check prefecture制霸 hidden achievements
+            checkHiddenPrefectureAchievements();
+
+            saveState();
+            updateUI();
+        }
+
+        function checkHiddenPrefectureAchievements() {
+            const allPrefCount = prefecturesData.length;
+            const visitedCount = appState.visitedPrefectures.length;
+            
+            // ID 175: 47都道府縣足跡制霸
+            if (visitedCount === allPrefCount) {
+                unlockAchievementInternal(175);
+                unlockAchievementInternal(188);
+            }
+        }
+
+        function renderRegionProgress() {
+            const panel = document.getElementById('regionsStatsPanel');
+            if (!panel) return;
+            panel.innerHTML = '';
+
+            // Group by region
+            const regions = ["北海道", "東北", "關東", "中部", "近畿", "中國", "四國", "九州", "沖繩"];
+            
+            regions.forEach(reg => {
+                const prefsInReg = prefecturesData.filter(p => p.region === reg || (reg === "九州" && p.region === "九州" && p.id !== "okinawa"));
+                const total = prefsInReg.length;
+                const visited = prefsInReg.filter(p => appState.visitedPrefectures.includes(p.id)).length;
+                const pct = total > 0 ? Math.round((visited / total) * 100) : 0;
+                
+                const widget = document.createElement('div');
+                widget.className = `region-badge ${activeFilters.search === reg ? 'active' : ''}`;
+                widget.innerHTML = `
+                    <div class="region-badge-header">
+                        <span>${reg}</span>
+                        <span>${visited}/${total}</span>
+                    </div>
+                    <div class="region-badge-bar">
+                        <div class="region-badge-fill" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                widget.onclick = () => {
+                    document.getElementById('searchBar').value = reg;
+                    handleSearch(reg);
+                };
+                panel.appendChild(widget);
+            });
+
+            // Update header numbers
+            const visitedCount = appState.visitedPrefectures.length;
+            const pctAll = Math.round((visitedCount / 47) * 100);
+            document.getElementById('totalPrefCount').textContent = `已踩點 ${visitedCount} / 47`;
+            document.getElementById('totalPrefPercentage').textContent = `${pctAll}%`;
+        }
+
+        // --- 11. HTML5 Canvas Radar Chart Rendering ---
+        function renderRadarChart() {
+            const canvas = document.getElementById('radarCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const categories = ["交通", "美食", "文化", "自然", "住宿", "購物", "攝影", "祭典", "離島", "極限挑戰"];
+            const scores = categories.map(cat => {
+                const inCat = achievementsData.filter(a => a.cat === cat);
+                const done = inCat.filter(a => appState.checkedAchievements.includes(a.id)).length;
+                return inCat.length > 0 ? (done / inCat.length) : 0;
+            });
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const r = 90;
+            const numPoints = categories.length;
+
+            const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+            const gridColor = isDark ? 'rgba(42, 71, 94, 0.4)' : 'rgba(230, 220, 208, 0.8)';
+            const labelColor = isDark ? '#c7d5e0' : '#2c2a29';
+            const axisColor = isDark ? 'rgba(42, 71, 94, 0.7)' : 'rgba(230, 220, 208, 1)';
+            const polyFill = isDark ? 'rgba(0, 210, 255, 0.25)' : 'rgba(215, 19, 24, 0.2)';
+            const polyStroke = isDark ? '#00d2ff' : '#d71318';
+
+            // Draw concentric web rings
+            const rings = 4;
+            for (let j = 1; j <= rings; j++) {
+                const radius = (r / rings) * j;
+                ctx.beginPath();
+                for (let i = 0; i < numPoints; i++) {
+                    const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                    const x = cx + Math.cos(angle) * radius;
+                    const y = cy + Math.sin(angle) * radius;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.strokeStyle = gridColor;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            // Draw axis lines and labels
+            ctx.font = 'bold 11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const emojis = {
+                "交通": "🚄", "美食": "🍣", "文化": "🎭", "自然": "🏔️", 
+                "住宿": "🛌", "購物": "🛒", "攝影": "📸", "祭典": "🏮", 
+                "離島": "🚢", "極限挑戰": "🌋"
+            };
+
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                const xAxis = cx + Math.cos(angle) * r;
+                const yAxis = cy + Math.sin(angle) * r;
+                
+                // Draw axis
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(xAxis, yAxis);
+                ctx.strokeStyle = axisColor;
+                ctx.stroke();
+
+                // Draw label with offset
+                const labelDist = r + 20;
+                const xLabel = cx + Math.cos(angle) * labelDist;
+                const yLabel = cy + Math.sin(angle) * (labelDist + 4);
+                
+                ctx.fillStyle = labelColor;
+                ctx.fillText(`${emojis[categories[i]]}${categories[i]}`, xLabel, yLabel);
+            }
+
+            // Draw scores polygon
+            ctx.beginPath();
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                const scoreRadius = scores[i] * r;
+                const x = cx + Math.cos(angle) * scoreRadius;
+                const y = cy + Math.sin(angle) * scoreRadius;
+                
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = polyFill;
+            ctx.fill();
+            ctx.strokeStyle = polyStroke;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Draw dots on polygon vertices
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                const scoreRadius = scores[i] * r;
+                const x = cx + Math.cos(angle) * scoreRadius;
+                const y = cy + Math.sin(angle) * scoreRadius;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = polyStroke;
+                ctx.fill();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#fff';
+                ctx.stroke();
+            }
+        }
+
+        // --- 12. Profile customization ---
+        function openAvatarPicker() {
+            const modal = document.getElementById('avatarPickerModal');
+            const grid = document.getElementById('avatarPickerGrid');
+            grid.innerHTML = '';
+            
+            avatars.forEach(emoji => {
+                const opt = document.createElement('div');
+                opt.className = 'avatar-option';
+                opt.textContent = emoji;
+                opt.onclick = () => {
+                    appState.playerAvatar = emoji;
+                    document.getElementById('playerAvatar').textContent = emoji;
+                    saveState();
+                    closeAvatarPicker();
+                };
+                grid.appendChild(opt);
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeAvatarPicker() {
+            document.getElementById('avatarPickerModal').style.display = 'none';
+        }
+
+        function saveProfileName(val) {
+            appState.playerName = val.trim() || "日本探險家";
+            saveState();
+        }
+
+        // --- 13. Theme Switching ---
+        function toggleTheme() {
+            if (appState.theme === 'light') {
+                appState.theme = 'dark';
+            } else {
+                appState.theme = 'light';
+            }
+            document.documentElement.setAttribute('data-theme', appState.theme);
+            saveState();
+            updateThemeButtonUI();
+            renderRadarChart();
+            renderMap();
+        }
+
+        function updateThemeButtonUI() {
+            const btnText = document.getElementById('themeToggleText');
+            const btnIcon = document.getElementById('themeToggleIcon');
+            
+            if (appState.theme === 'light') {
+                btnText.textContent = "切換深色";
+                btnIcon.textContent = "🌙";
+            } else {
+                btnText.textContent = "切換淺色";
+                btnIcon.textContent = "☀️";
+            }
+        }
+
+        // --- 14. Filtering Achievements ---
+        function handleSearch(val) {
+            activeFilters.search = val.toLowerCase().trim();
+            const btn = document.getElementById('clearSearchBtn');
+            if (activeFilters.search.length > 0) {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+            filterAchievements();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchBar').value = '';
+            handleSearch('');
+        }
+
+        function filterByBadge(badgeId) {
+            document.querySelectorAll('.quick-filter-tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            document.getElementById(`badgeTag-${badgeId}`).classList.add('active');
+
+            activeFilters.badge = badgeId;
+            filterAchievements();
+        }
+
+        function filterAchievements() {
+            activeFilters.diff = document.getElementById('diffFilter').value;
+            activeFilters.rarity = document.getElementById('rarityFilter').value;
+            activeFilters.status = document.getElementById('statusFilter').value;
+
+            renderAchievements();
+        }
+
+        // --- 15. Achievements Core Render Engine ---
+        function renderAchievements() {
+            const container = document.getElementById('achievementsContainer');
+            if (!container) return;
+
+            const categories = ["交通", "美食", "文化", "自然", "住宿", "購物", "攝影", "祭典", "離島", "極限挑戰"];
+            
+            const collStatus = {};
+            document.querySelectorAll('.category-wrapper').forEach(wrapper => {
+                const cat = wrapper.getAttribute('data-category');
+                collStatus[cat] = wrapper.classList.contains('collapsed');
+            });
+
+            container.innerHTML = '';
+
+            categories.forEach(cat => {
+                const inCat = achievementsData.filter(a => a.cat === cat);
+                const totalInCat = inCat.length;
+                const completedInCat = inCat.filter(a => appState.checkedAchievements.includes(a.id)).length;
+
+                const filteredInCat = inCat.filter(ach => {
+                    if (activeFilters.search.length > 0) {
+                        const mName = ach.name.toLowerCase().includes(activeFilters.search);
+                        const mDesc = ach.desc.toLowerCase().includes(activeFilters.search);
+                        let mPref = false;
+                        const matchPrefs = prefecturesData.filter(p => p.region.includes(activeFilters.search) || p.name.includes(activeFilters.search));
+                        if (matchPrefs.length > 0) {
+                            mPref = matchPrefs.some(p => ach.desc.includes(p.name) || ach.name.includes(p.name));
+                        }
+                        if (!mName && !mDesc && !mPref) return false;
+                    }
+
+                    if (activeFilters.diff !== 'all') {
+                        if (ach.diff !== parseInt(activeFilters.diff)) return false;
+                    }
+
+                    if (activeFilters.rarity !== 'all') {
+                        if (ach.rarity !== activeFilters.rarity) return false;
+                    }
+
+                    if (activeFilters.status !== 'all') {
+                        const isDone = appState.checkedAchievements.includes(ach.id);
+                        if (activeFilters.status === 'completed' && !isDone) return false;
+                        if (activeFilters.status === 'uncompleted' && isDone) return false;
+                    }
+
+                    if (activeFilters.badge !== 'all') {
+                        if (ach.badgeId !== activeFilters.badge) return false;
+                    }
+
+                    return true;
+                });
+
+                if (filteredInCat.length === 0) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'category-wrapper';
+                wrapper.setAttribute('data-category', cat);
+                if (collStatus[cat] !== undefined ? collStatus[cat] : false) {
+                    wrapper.classList.add('collapsed');
+                }
+
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.innerHTML = `
+                    <div class="category-info">
+                        <span class="category-title">${getCategoryEmoji(cat)} ${cat}</span>
+                        <span class="category-progress-pill">${completedInCat} / ${totalInCat}</span>
+                    </div>
+                    <span class="category-toggle-icon">▼</span>
+                `;
+                
+                header.onclick = () => {
+                    wrapper.classList.toggle('collapsed');
+                };
+
+                const content = document.createElement('div');
+                content.className = 'category-content';
+
+                const grid = document.createElement('div');
+                grid.className = 'achievements-grid';
+
+                filteredInCat.forEach(ach => {
+                    const isDone = appState.checkedAchievements.includes(ach.id);
+                    const card = document.createElement('div');
+                    card.className = `achievement-card ${isDone ? 'completed' : ''} ${ach.hidden ? 'hidden-ach' : ''}`;
+                    card.setAttribute('data-id', ach.id);
+                    
+                    const stars = '★'.repeat(ach.diff) + '☆'.repeat(5 - Math.min(ach.diff, 5));
+                    
+                    let htmlContent = `
+                        <div class="ach-checkbox-container">
+                            <input type="checkbox" class="ach-checkbox" ${isDone ? 'checked' : ''} onchange="toggleAchievement(${ach.id})">
+                            <span class="ach-checkbox-custom"></span>
+                        </div>
+                        <div class="ach-info">
+                            <div class="ach-meta">
+                                <span class="ach-difficulty-stars">${stars}</span>
+                                <span class="rarity-pill rarity-${ach.rarity.toLowerCase()}">${ach.rarity}</span>
+                            </div>
+                            <div class="ach-name">${ach.hidden && !isDone ? '??? 隱藏成就' : ach.name}</div>
+                            <div class="ach-desc">${ach.hidden && !isDone ? '解鎖或滑鼠懸停以揭曉內容。' : ach.desc}</div>
+                        </div>
+                    `;
+
+                    if (ach.hidden && !isDone) {
+                        htmlContent += `
+                            <div class="hidden-overlay">
+                                <span>🔒 STEAM 隱藏成就</span>
+                            </div>
+                        `;
+                    }
+
+                    card.innerHTML = htmlContent;
+                    
+                    card.onclick = (e) => {
+                        if (e.target.tagName !== 'INPUT' && e.target.className !== 'ach-checkbox-custom') {
+                            const cb = card.querySelector('.ach-checkbox');
+                            cb.checked = !cb.checked;
+                            toggleAchievement(ach.id);
+                        }
+                    };
+
+                    grid.appendChild(card);
+                });
+
+                content.appendChild(grid);
+                wrapper.appendChild(header);
+                wrapper.appendChild(content);
+                container.appendChild(wrapper);
+            });
+        }
+
+        function getCategoryEmoji(cat) {
+            const emo = {
+                "交通": "🚄", "美食": "🍣", "文化": "🎭", "自然": "🏔️", 
+                "住宿": "🛌", "購物": "🛒", "攝影": "📸", "祭典": "🏮", 
+                "離島": "🚢", "極限挑戰": "🌋"
+            };
+            return emo[cat] || "🧭";
+        }
+
+        // --- 16. Badge & Achievement Unlock Engine ---
+        function toggleAchievement(id) {
+            const idx = appState.checkedAchievements.indexOf(id);
+            const ach = achievementsData.find(a => a.id === id);
+
+            if (idx === -1) {
+                appState.checkedAchievements.push(id);
+                showNotification("成就解除！", ach.name, "🏆");
+                
+                if (ach.hidden) {
+                    setTimeout(() => {
+                        const card = document.querySelector(`.achievement-card[data-id="${id}"]`);
+                        if (card) {
+                            card.classList.remove('hidden-ach');
+                            const overlay = card.querySelector('.hidden-overlay');
+                            if (overlay) overlay.remove();
+                        }
+                    }, 500);
+                }
+            } else {
+                appState.checkedAchievements.splice(idx, 1);
+            }
+
+            saveState();
+            updateUI();
+        }
+
+        function unlockAchievementInternal(id) {
+            if (!appState.checkedAchievements.includes(id)) {
+                appState.checkedAchievements.push(id);
+                const ach = achievementsData.find(a => a.id === id);
+                showNotification("成就解除！", ach.name, "🏆");
+            }
+        }
+
+        function checkBadgeUnlocks() {
+            let activeCount = 0;
+            badgeData.forEach(badge => {
+                const stat = getBadgeProgress(badge.id);
+                const badgeEl = document.getElementById(`badge-${badge.id}`);
+                
+                if (badgeEl) {
+                    if (stat.unlocked) {
+                        if (!badgeEl.classList.contains('unlocked')) {
+                            badgeEl.classList.add('unlocked');
+                            showNotification("解鎖榮譽徽章！", `${badge.emoji} [${badge.name}] 已加入收藏牆`, "🏆");
+                        }
+                        activeCount++;
+                    } else {
+                        badgeEl.classList.remove('unlocked');
+                    }
+                    badgeEl.setAttribute('data-tooltip', `${badge.emoji} ${badge.name}: ${badge.desc} (${stat.count}/${stat.total})`);
+                }
+            });
+
+            document.getElementById('badgeUnlockCount').textContent = `${activeCount} / 13`;
+        }
+
+        function renderBadgeWall() {
+            const grid = document.getElementById('badgeWallGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            badgeData.forEach(badge => {
+                const el = document.createElement('div');
+                el.className = 'badge-item';
+                el.id = `badge-${badge.id}`;
+                el.textContent = badge.emoji;
+                grid.appendChild(el);
+            });
+
+            checkBadgeUnlocks();
+        }
+
+        // --- 17. Master UI Layout Synchronizer ---
+        function updateUI() {
+            const completedCount = appState.checkedAchievements.length;
+            const lvlDetails = getLevelDetails(completedCount);
+            
+            document.getElementById('playerLevelDisplay').textContent = `LEVEL ${lvlDetails.level}`;
+            document.getElementById('playerTitle').textContent = lvlDetails.title;
+            
+            const xpText = `${completedCount} / 200 成就`;
+            document.getElementById('playerXpDisplay').textContent = xpText;
+            
+            const pctXP = Math.round((completedCount / 200) * 100);
+            document.getElementById('playerLevelProgress').style.width = `${pctXP}%`;
+
+            renderRadarChart();
+            renderMap();
+            renderAchievements();
+            checkBadgeUnlocks();
+        }
+
+        // --- 18. Share Achievement Card Exporter (Canvas) ---
+        function generateShareCard() {
+            const backdrop = document.getElementById('shareModalBackdrop');
+            const canvas = document.getElementById('sharingPreviewCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Polyfill for roundRect on older/legacy browsers
+            if (typeof ctx.roundRect !== 'function') {
+                ctx.roundRect = function (x, y, w, h, r) {
+                    if (typeof r === 'number') r = [r, r, r, r];
+                    else if (Array.isArray(r)) {
+                        if (r.length === 1) r = [r[0], r[0], r[0], r[0]];
+                        else if (r.length === 2) r = [r[0], r[1], r[0], r[1]];
+                        else if (r.length === 3) r = [r[0], r[1], r[2], r[1]];
+                    } else r = [0, 0, 0, 0];
+                    this.beginPath();
+                    this.moveTo(x + r[0], y);
+                    this.lineTo(x + w - r[1], y);
+                    this.quadraticCurveTo(x + w, y, x + w, y + r[1]);
+                    this.lineTo(x + w, y + h - r[2]);
+                    this.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
+                    this.lineTo(x + r[3], y + h);
+                    this.quadraticCurveTo(x, y + h, x, y + h - r[3]);
+                    this.lineTo(x, y + r[0]);
+                    this.quadraticCurveTo(x, y, x + r[0], y);
+                    this.closePath();
+                    return this;
+                };
+            }
+
+            const isDark = appState.theme !== 'light';
+            
+            if (isDark) {
+                const grad = ctx.createRadialGradient(400, 600, 100, 400, 600, 700);
+                grad.addColorStop(0, '#1f2d3d');
+                grad.addColorStop(1, '#0e141b');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 800, 1200);
+
+                ctx.strokeStyle = '#2a475e';
+                ctx.lineWidth = 10;
+                ctx.strokeRect(10, 10, 780, 1180);
+                ctx.strokeStyle = '#00d2ff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(20, 20, 760, 1160);
+            } else {
+                ctx.fillStyle = '#faf6f0';
+                ctx.fillRect(0, 0, 800, 1200);
+                
+                ctx.strokeStyle = '#e6dcd0';
+                ctx.lineWidth = 10;
+                ctx.strokeRect(10, 10, 780, 1180);
+                ctx.strokeStyle = '#d71318';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(20, 20, 760, 1160);
+            }
+
+            ctx.font = 'bold 36px sans-serif';
+            ctx.fillStyle = isDark ? '#ffffff' : '#2c2a29';
+            ctx.textAlign = 'center';
+            ctx.fillText('日本旅行成就記錄卡', 400, 80);
+            
+            ctx.font = '800 14px sans-serif';
+            ctx.fillStyle = isDark ? '#00d2ff' : '#d71318';
+            ctx.fillText('JAPAN TRAVEL ACHIEVEMENT CARD • ULTIMATE EDITION', 400, 115);
+
+            ctx.beginPath();
+            ctx.moveTo(60, 140);
+            ctx.lineTo(740, 140);
+            ctx.strokeStyle = isDark ? '#2a475e' : '#e6dcd0';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.font = '80px sans-serif';
+            ctx.fillText(appState.playerAvatar, 140, 230);
+
+            ctx.textAlign = 'left';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.fillStyle = isDark ? '#ffffff' : '#2c2a29';
+            ctx.fillText(appState.playerName, 230, 195);
+            
+            const lvlDetails = getLevelDetails(appState.checkedAchievements.length);
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillStyle = isDark ? '#ffd700' : '#d71318';
+            ctx.fillText(`等級 ${lvlDetails.level} • ${lvlDetails.title}`, 230, 235);
+
+            ctx.fillStyle = isDark ? '#1b2838' : '#ffffff';
+            ctx.strokeStyle = isDark ? '#2a475e' : '#e6dcd0';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(470, 160, 270, 95, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillStyle = isDark ? '#c7d5e0' : '#5a5754';
+            ctx.fillText('總成就解鎖率', 535, 195);
+            ctx.fillText('都道府縣足跡', 675, 195);
+
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillStyle = isDark ? '#00d2ff' : '#d71318';
+            const achPct = Math.round((appState.checkedAchievements.length / 200) * 100);
+            const prefPct = Math.round((appState.visitedPrefectures.length / 47) * 100);
+            ctx.fillText(`${achPct}%`, 535, 230);
+            ctx.fillText(`${prefPct}%`, 675, 230);
+
+            ctx.beginPath();
+            ctx.moveTo(60, 290);
+            ctx.lineTo(740, 290);
+            ctx.stroke();
+
+            ctx.textAlign = 'left';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillStyle = isDark ? '#c7d5e0' : '#2c2a29';
+            ctx.fillText('📊 分類探索度', 60, 330);
+
+            const rcx = 220, rcy = 510, rr = 100;
+            const categories = ["交通", "美食", "文化", "自然", "住宿", "購物", "攝影", "祭典", "離島", "極限挑戰"];
+            const scores = categories.map(cat => {
+                const inCat = achievementsData.filter(a => a.cat === cat);
+                const done = inCat.filter(a => appState.checkedAchievements.includes(a.id)).length;
+                return inCat.length > 0 ? (done / inCat.length) : 0;
+            });
+            const numPoints = categories.length;
+
+            const gridColor = isDark ? 'rgba(42, 71, 94, 0.4)' : 'rgba(230, 220, 208, 0.8)';
+            const labelColor = isDark ? '#c7d5e0' : '#2c2a29';
+            const polyFill = isDark ? 'rgba(0, 210, 255, 0.25)' : 'rgba(215, 19, 24, 0.2)';
+            const polyStroke = isDark ? '#00d2ff' : '#d71318';
+
+            for (let j = 1; j <= 4; j++) {
+                const rad = (rr / 4) * j;
+                ctx.beginPath();
+                for (let i = 0; i < numPoints; i++) {
+                    const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                    const x = rcx + Math.cos(angle) * rad;
+                    const y = rcy + Math.sin(angle) * rad;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.strokeStyle = gridColor;
+                ctx.stroke();
+            }
+            ctx.font = 'bold 9px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                const labelDist = rr + 15;
+                const xLabel = rcx + Math.cos(angle) * labelDist;
+                const yLabel = rcy + Math.sin(angle) * labelDist;
+                ctx.fillStyle = labelColor;
+                ctx.fillText(categories[i], xLabel, yLabel);
+            }
+            ctx.beginPath();
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                const scoreRadius = scores[i] * rr;
+                const x = rcx + Math.cos(angle) * scoreRadius;
+                const y = rcy + Math.sin(angle) * scoreRadius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = polyFill;
+            ctx.fill();
+            ctx.strokeStyle = polyStroke;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.textAlign = 'left';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillStyle = isDark ? '#c7d5e0' : '#2c2a29';
+            ctx.fillText('🏆 解鎖榮譽徽章牆', 430, 330);
+
+            let bx = 430, by = 360;
+            let count = 0;
+            badgeData.forEach(badge => {
+                const stat = getBadgeProgress(badge.id);
+                
+                ctx.save();
+                if (!stat.unlocked) {
+                    ctx.globalAlpha = 0.2;
+                }
+                
+                ctx.fillStyle = isDark ? '#1b2838' : '#ffffff';
+                ctx.strokeStyle = stat.unlocked ? (isDark ? '#ffd700' : '#d71318') : (isDark ? '#2a475e' : '#e6dcd0');
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(bx + 25, by + 25, 25, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.font = '28px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(badge.emoji, bx + 25, by + 27);
+                
+                ctx.restore();
+
+                bx += 65;
+                count++;
+                if (count % 5 === 0) {
+                    bx = 430;
+                    by += 65;
+                }
+            });
+
+            ctx.beginPath();
+            ctx.moveTo(60, 680);
+            ctx.lineTo(740, 680);
+            ctx.strokeStyle = isDark ? '#2a475e' : '#e6dcd0';
+            ctx.stroke();
+
+            ctx.textAlign = 'left';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.fillStyle = isDark ? '#c7d5e0' : '#2c2a29';
+            ctx.fillText('🌟 最引以為傲的冒險成就', 60, 720);
+
+            const unlockedAchs = achievementsData.filter(a => appState.checkedAchievements.includes(a.id));
+            unlockedAchs.sort((a, b) => b.diff - a.diff || b.id - a.id);
+            const showcase = unlockedAchs.slice(0, 3);
+
+            let achY = 760;
+            for (let i = 0; i < 3; i++) {
+                ctx.fillStyle = isDark ? '#1b2838' : '#ffffff';
+                ctx.strokeStyle = isDark ? '#2a475e' : '#e6dcd0';
+                ctx.beginPath();
+                ctx.roundRect(60, achY, 680, 100, 12);
+                ctx.fill();
+                ctx.stroke();
+
+                if (showcase[i]) {
+                    const ach = showcase[i];
+                    ctx.font = 'bold 18px sans-serif';
+                    ctx.fillStyle = isDark ? '#ffffff' : '#2c2a29';
+                    ctx.fillText(ach.name, 90, achY + 40);
+
+                    const starsText = '★'.repeat(ach.diff) + '☆'.repeat(5 - Math.min(ach.diff, 5));
+                    ctx.font = '12px sans-serif';
+                    ctx.fillStyle = isDark ? '#ffd700' : '#d71318';
+                    ctx.fillText(starsText, 90, achY + 75);
+
+                    ctx.font = 'bold 10px sans-serif';
+                    ctx.fillStyle = isDark ? '#00ff87' : '#2e5c1e';
+                    ctx.fillText(`[${ach.rarity.toUpperCase()}]`, 220, achY + 74);
+
+                    ctx.font = '13px sans-serif';
+                    ctx.fillStyle = isDark ? '#c7d5e0' : '#5a5754';
+                    ctx.fillText(ach.desc, 320, achY + 40);
+                    ctx.fillText(`分類：${ach.cat}`, 320, achY + 70);
+                } else {
+                    ctx.font = 'italic 16px sans-serif';
+                    ctx.fillStyle = isDark ? '#8fa0b0' : '#8b8882';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('尚無解鎖此欄位之高級成就，趕快去旅行吧！', 400, achY + 55);
+                    ctx.textAlign = 'left';
+                }
+                achY += 120;
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(60, 1120);
+            ctx.lineTo(740, 1120);
+            ctx.strokeStyle = isDark ? '#2a475e' : '#e6dcd0';
+            ctx.stroke();
+
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillStyle = isDark ? '#8fa0b0' : '#8b8882';
+            ctx.textAlign = 'left';
+            ctx.fillText('本成就卡由「日本旅行成就系統 Ultimate Edition」產出', 60, 1150);
+            
+            ctx.textAlign = 'right';
+            ctx.fillText('yblog.org • ivanusto', 740, 1150);
+
+            backdrop.style.display = 'flex';
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModalBackdrop').style.display = 'none';
+        }
+
+        function downloadShareCard() {
+            const canvas = document.getElementById('sharingPreviewCanvas');
+            const url = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `japan_travel_achievement_${appState.playerName}.png`;
+            a.click();
+            closeShareModal();
+            showNotification("圖卡下載成功", "歡迎分享到 Threads 或 Instagram！", "📸");
+        }
+
+        // --- 19. Initializer ---
+        window.onload = function() {
+            loadState();
+            renderBadgeWall();
+            updateUI();
+        };
+    </script>
+</body>
+</html>
