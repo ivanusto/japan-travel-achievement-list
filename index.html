@@ -1328,6 +1328,71 @@
             box-shadow: 0 4px 10px var(--shadow-glow);
         }
 
+        /* Custom (user-defined) achievements */
+        .rarity-pill.rarity-custom {
+            background: rgba(0, 210, 255, 0.1);
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .custom-ach-tools {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .custom-ach-tool-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px;
+            opacity: 0.55;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .custom-ach-tool-btn:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .custom-ach-empty {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 8px 0;
+        }
+
+        .custom-form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+        }
+
+        .custom-form-field label {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-secondary);
+        }
+
+        .custom-form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .custom-form-input:focus {
+            border-color: var(--border-color-active);
+        }
+
     </style>
 </head>
 <body>
@@ -1431,6 +1496,22 @@
 
                         <!-- Region Badge stats -->
                         <div class="regions-stats-panel" id="regionsStatsPanel"></div>
+                    </div>
+                </div>
+
+                <!-- Custom (user-defined) achievements card -->
+                <div class="card">
+                    <div class="map-section-header">
+                        <div class="map-section-title">
+                            <span>🌟</span> 我的自訂成就 (<span id="customAchCount">0 / 0</span>)
+                        </div>
+                        <button class="btn" id="addCustomAchBtn" onclick="openCustomAchModal()">
+                            <span>➕</span> 新增自訂成就
+                        </button>
+                    </div>
+                    <div class="achievements-grid" id="customAchGrid"></div>
+                    <div class="custom-ach-empty" id="customAchEmptyHint">
+                        還沒有自訂成就。把官方清單沒有、但對你別具意義的旅行時刻記下來吧！（最多 10 個，會計入總成就數與等級）
                     </div>
                 </div>
 
@@ -1865,6 +1946,7 @@
             playerAvatar: "🥋",
             checkedAchievements: [],
             visitedPrefectures: [],
+            customAchievements: [],
             theme: "dark",
             registered: false
         };
@@ -2071,6 +2153,8 @@
                     console.error("Failed to load local storage state:", e);
                 }
             }
+
+            appState.customAchievements = sanitizeCustomAchievements(appState.customAchievements);
             
             // Apply theme
             document.documentElement.setAttribute('data-theme', appState.theme);
@@ -2090,6 +2174,7 @@
             if (confirm("⚠️ 確定要重置所有旅遊成就與都道府縣足跡嗎？此動作無法復原！")) {
                 appState.checkedAchievements = [];
                 appState.visitedPrefectures = [];
+                appState.customAchievements.forEach(c => c.done = false);
                 saveState();
                 updateUI();
                 showNotification("進度重置", "已清除所有勾選記錄", "🔄");
@@ -2120,6 +2205,7 @@
                         const validPrefIds = new Set(prefecturesData.map(p => p.id));
                         appState.checkedAchievements = parsed.checkedAchievements.filter(id => validAchIds.has(id));
                         appState.visitedPrefectures = parsed.visitedPrefectures.filter(id => validPrefIds.has(id));
+                        appState.customAchievements = sanitizeCustomAchievements(parsed.customAchievements);
                         if (typeof parsed.playerName === 'string' && parsed.playerName.trim()) {
                             appState.playerName = parsed.playerName.trim().slice(0, 15);
                         }
@@ -2700,6 +2786,158 @@
             return CATEGORY_EMOJIS[cat] || "🧭";
         }
 
+        // --- 15.5 Custom Achievements (user-defined) ---
+        // Count toward the total achievement count and level, but stay out of
+        // badges, the radar chart and category progress to keep those balanced.
+        const CUSTOM_ACH_LIMIT = 10;
+        let editingCustomAchId = null;
+
+        function sanitizeCustomAchievements(arr) {
+            if (!Array.isArray(arr)) return [];
+            return arr
+                .filter(c => c && typeof c.name === 'string' && c.name.trim())
+                .slice(0, CUSTOM_ACH_LIMIT)
+                .map((c, i) => ({
+                    id: (typeof c.id === 'number' && isFinite(c.id)) ? c.id : Date.now() + i,
+                    name: c.name.trim().slice(0, 30),
+                    desc: typeof c.desc === 'string' ? c.desc.trim().slice(0, 60) : '',
+                    diff: Math.min(5, Math.max(1, parseInt(c.diff) || 1)),
+                    done: c.done === true
+                }));
+        }
+
+        function getAchievementTotals() {
+            const customDone = appState.customAchievements.filter(c => c.done).length;
+            return {
+                completed: appState.checkedAchievements.length + customDone,
+                total: achievementsData.length + appState.customAchievements.length
+            };
+        }
+
+        function renderCustomAchievements() {
+            const grid = document.getElementById('customAchGrid');
+            if (!grid) return;
+            const list = appState.customAchievements;
+
+            grid.innerHTML = '';
+            document.getElementById('customAchEmptyHint').style.display = list.length ? 'none' : '';
+            document.getElementById('addCustomAchBtn').style.display = list.length >= CUSTOM_ACH_LIMIT ? 'none' : '';
+            const doneCount = list.filter(c => c.done).length;
+            document.getElementById('customAchCount').textContent = `${doneCount} / ${list.length}`;
+
+            list.forEach(c => {
+                const card = document.createElement('div');
+                card.className = `achievement-card ${c.done ? 'completed' : ''}`;
+
+                const stars = '★'.repeat(c.diff) + '☆'.repeat(5 - c.diff);
+                card.innerHTML = `
+                    <div class="ach-checkbox-container">
+                        <input type="checkbox" class="ach-checkbox">
+                        <span class="ach-checkbox-custom"></span>
+                    </div>
+                    <div class="ach-info">
+                        <div class="ach-meta">
+                            <span class="ach-difficulty-stars">${stars}</span>
+                            <span class="custom-ach-tools">
+                                <span class="rarity-pill rarity-custom">自訂</span>
+                                <button class="custom-ach-tool-btn" title="編輯" aria-label="編輯自訂成就">✏️</button>
+                                <button class="custom-ach-tool-btn" title="刪除" aria-label="刪除自訂成就">🗑️</button>
+                            </span>
+                        </div>
+                        <div class="ach-name"></div>
+                        <div class="ach-desc"></div>
+                    </div>
+                `;
+                // User-entered text goes in via textContent, never innerHTML
+                card.querySelector('.ach-name').textContent = c.name;
+                card.querySelector('.ach-desc').textContent = c.desc || '由你親自訂立的專屬成就。';
+
+                const checkbox = card.querySelector('.ach-checkbox');
+                checkbox.checked = c.done;
+                checkbox.onchange = () => toggleCustomAchievement(c.id);
+
+                const [editBtn, delBtn] = card.querySelectorAll('.custom-ach-tool-btn');
+                editBtn.onclick = (e) => { e.stopPropagation(); openCustomAchModal(c.id); };
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteCustomAchievement(c.id); };
+
+                card.onclick = (e) => {
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+                        checkbox.checked = !checkbox.checked;
+                        toggleCustomAchievement(c.id);
+                    }
+                };
+
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleCustomAchievement(id) {
+            const c = appState.customAchievements.find(x => x.id === id);
+            if (!c) return;
+            c.done = !c.done;
+            if (c.done) {
+                showNotification("成就解除！", c.name, "🌟");
+            }
+            saveState();
+            updateUI();
+        }
+
+        function openCustomAchModal(editId = null) {
+            if (editId === null && appState.customAchievements.length >= CUSTOM_ACH_LIMIT) {
+                showNotification("已達上限", `自訂成就最多 ${CUSTOM_ACH_LIMIT} 個`, "⚠️");
+                return;
+            }
+            editingCustomAchId = editId;
+            const editing = editId !== null ? appState.customAchievements.find(c => c.id === editId) : null;
+
+            document.getElementById('customAchModalTitle').textContent = editing ? '✏️ 編輯自訂成就' : '🌟 新增自訂成就';
+            document.getElementById('customAchName').value = editing ? editing.name : '';
+            document.getElementById('customAchDesc').value = editing ? editing.desc : '';
+            document.getElementById('customAchDiff').value = editing ? String(editing.diff) : '3';
+            document.getElementById('customAchModal').style.display = 'flex';
+            document.getElementById('customAchName').focus();
+        }
+
+        function closeCustomAchModal() {
+            document.getElementById('customAchModal').style.display = 'none';
+            editingCustomAchId = null;
+        }
+
+        function saveCustomAchievement() {
+            const name = document.getElementById('customAchName').value.trim().slice(0, 30);
+            if (!name) {
+                alert('請輸入成就名稱！');
+                return;
+            }
+            const desc = document.getElementById('customAchDesc').value.trim().slice(0, 60);
+            const diff = Math.min(5, Math.max(1, parseInt(document.getElementById('customAchDiff').value) || 3));
+
+            if (editingCustomAchId !== null) {
+                const c = appState.customAchievements.find(x => x.id === editingCustomAchId);
+                if (c) {
+                    c.name = name;
+                    c.desc = desc;
+                    c.diff = diff;
+                }
+            } else {
+                appState.customAchievements.push({ id: Date.now(), name, desc, diff, done: false });
+                showNotification("已建立自訂成就", name, "🌟");
+            }
+
+            closeCustomAchModal();
+            saveState();
+            updateUI();
+        }
+
+        function deleteCustomAchievement(id) {
+            const c = appState.customAchievements.find(x => x.id === id);
+            if (!c) return;
+            if (!confirm(`確定要刪除自訂成就「${c.name}」嗎？`)) return;
+            appState.customAchievements = appState.customAchievements.filter(x => x.id !== id);
+            saveState();
+            updateUI();
+        }
+
         // --- 16. Badge & Achievement Unlock Engine ---
         function toggleAchievement(id) {
             const idx = appState.checkedAchievements.indexOf(id);
@@ -2769,21 +3007,23 @@
 
         // --- 17. Master UI Layout Synchronizer ---
         function updateUI() {
-            const completedCount = appState.checkedAchievements.length;
+            const totals = getAchievementTotals();
+            const completedCount = totals.completed;
             const lvlDetails = getLevelDetails(completedCount);
             
             document.getElementById('playerLevelDisplay').textContent = `LEVEL ${lvlDetails.level}`;
             document.getElementById('playerTitle').textContent = lvlDetails.title;
             
-            const xpText = `${completedCount} / 200 成就`;
+            const xpText = `${completedCount} / ${totals.total} 成就`;
             document.getElementById('playerXpDisplay').textContent = xpText;
             
-            const pctXP = Math.round((completedCount / 200) * 100);
+            const pctXP = Math.round((completedCount / totals.total) * 100);
             document.getElementById('playerLevelProgress').style.width = `${pctXP}%`;
 
             renderRadarChart();
             updateMap();
             updateAchievementsUI();
+            renderCustomAchievements();
             checkBadgeUnlocks();
         }
 
@@ -2878,7 +3118,8 @@
             ctx.fillStyle = isDark ? '#ffffff' : '#2c2a29';
             ctx.fillText(truncateToWidth(ctx, appState.playerName, 225), 230, 195);
             
-            const lvlDetails = getLevelDetails(appState.checkedAchievements.length);
+            const cardTotals = getAchievementTotals();
+            const lvlDetails = getLevelDetails(cardTotals.completed);
             ctx.font = 'bold 16px sans-serif';
             ctx.fillStyle = isDark ? '#ffd700' : '#d71318';
             ctx.fillText(`等級 ${lvlDetails.level} • ${lvlDetails.title}`, 230, 235);
@@ -2899,7 +3140,7 @@
 
             ctx.font = 'bold 24px sans-serif';
             ctx.fillStyle = isDark ? '#00d2ff' : '#d71318';
-            const achPct = Math.round((appState.checkedAchievements.length / 200) * 100);
+            const achPct = Math.round((cardTotals.completed / cardTotals.total) * 100);
             const prefPct = Math.round((appState.visitedPrefectures.length / 47) * 100);
             ctx.fillText(`${achPct}%`, 535, 230);
             ctx.fillText(`${prefPct}%`, 675, 230);
@@ -2972,7 +3213,8 @@
             ctx.fillStyle = isDark ? '#c7d5e0' : '#2c2a29';
             ctx.fillText('🌟 最引以為傲的冒險成就', 60, 720);
 
-            const unlockedAchs = achievementsData.filter(a => appState.checkedAchievements.includes(a.id));
+            const unlockedAchs = achievementsData.filter(a => appState.checkedAchievements.includes(a.id))
+                .concat(appState.customAchievements.filter(c => c.done).map(c => ({ ...c, rarity: 'Custom', cat: '自訂' })));
             unlockedAchs.sort((a, b) => b.diff - a.diff || b.id - a.id);
             const showcase = unlockedAchs.slice(0, 3);
 
@@ -3053,9 +3295,9 @@
         const SHARE_URL = 'https://ivanusto.github.io/japan-travel-achievement-list/';
 
         function buildShareText() {
-            const achCount = appState.checkedAchievements.length;
+            const totals = getAchievementTotals();
             const prefCount = appState.visitedPrefectures.length;
-            return `我在「日本旅行成就系統」解鎖了 ${achCount}/200 項成就、踩點 ${prefCount}/47 個都道府縣！快來挑戰你的日本旅行足跡 🇯🇵`;
+            return `我在「日本旅行成就系統」解鎖了 ${totals.completed}/${totals.total} 項成就、踩點 ${prefCount}/47 個都道府縣！快來挑戰你的日本旅行足跡 🇯🇵`;
         }
 
         function shareToSocial(platform) {
@@ -3196,6 +3438,37 @@
             initApp();
         }
     </script>
+
+    <!-- Custom Achievement Editor Modal -->
+    <div class="avatar-picker-backdrop" id="customAchModal" onclick="closeCustomAchModal()">
+        <div class="avatar-picker-modal" style="max-width: 460px;" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0;" id="customAchModalTitle">🌟 新增自訂成就</h3>
+            <div style="display:flex; flex-direction:column; gap:14px; margin: 16px 0 20px 0;">
+                <div class="custom-form-field">
+                    <label for="customAchName">成就名稱（必填，30 字內）</label>
+                    <input type="text" id="customAchName" class="custom-form-input" maxlength="30" placeholder="例如：在扭蛋店一次扭中隱藏款 🎰">
+                </div>
+                <div class="custom-form-field">
+                    <label for="customAchDesc">成就描述（選填，60 字內）</label>
+                    <input type="text" id="customAchDesc" class="custom-form-input" maxlength="60" placeholder="記下這個成就的達成條件或背後的故事...">
+                </div>
+                <div class="custom-form-field">
+                    <label for="customAchDiff">難度星級</label>
+                    <select id="customAchDiff" class="select-filter" style="width:100%;">
+                        <option value="1">★☆☆☆☆ (輕鬆達成)</option>
+                        <option value="2">★★☆☆☆ (小有挑戰)</option>
+                        <option value="3" selected>★★★☆☆ (需要努力)</option>
+                        <option value="4">★★★★☆ (相當困難)</option>
+                        <option value="5">★★★★★ (畢生難忘)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="share-actions">
+                <button class="btn btn-accent" onclick="saveCustomAchievement()">儲存</button>
+                <button class="btn" onclick="closeCustomAchModal()">取消</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Character Registration Modal -->
     <div class="avatar-picker-backdrop" id="charRegisterModal" style="display: none;">
