@@ -2412,7 +2412,7 @@
                     card.innerHTML = htmlContent;
                     
                     card.onclick = (e) => {
-                        if (e.target.tagName !== 'INPUT' && e.target.className !== 'ach-checkbox-custom') {
+                        if (e.target.tagName !== 'INPUT') {
                             const cb = card.querySelector('.ach-checkbox');
                             cb.checked = !cb.checked;
                             toggleAchievement(ach.id);
