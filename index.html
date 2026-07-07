@@ -4,8 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日本旅行成就系統 Ultimate Edition</title>
+    <meta name="description" content="200 項日本旅遊成就打卡、47 都道府縣足跡地圖、榮譽徽章牆與探索雷達圖，一鍵生成可分享的旅行成就卡。進度自動保存在瀏覽器，免安裝免註冊。">
+    <meta name="theme-color" content="#12181f">
+    <link rel="canonical" href="https://ivanusto.github.io/japan-travel-achievement-list/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛩️</text></svg>">
+
+    <!-- Open Graph / Twitter social sharing cards -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="日本旅行成就系統 Ultimate Edition">
+    <meta property="og:title" content="日本旅行成就系統 Ultimate Edition">
+    <meta property="og:description" content="200 項日本旅遊成就、47 都道府縣足跡地圖、徽章牆與雷達圖，一鍵生成你的日本旅行成就卡！">
+    <meta property="og:url" content="https://ivanusto.github.io/japan-travel-achievement-list/">
+    <meta property="og:image" content="https://ivanusto.github.io/japan-travel-achievement-list/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="zh_TW">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="日本旅行成就系統 Ultimate Edition">
+    <meta name="twitter:description" content="200 項日本旅遊成就、47 都道府縣足跡地圖、徽章牆與雷達圖，一鍵生成你的日本旅行成就卡！">
+    <meta name="twitter:image" content="https://ivanusto.github.io/japan-travel-achievement-list/og-image.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+
+    <script>
+        // Apply saved theme before first paint to avoid a dark-theme flash for light-theme users
+        try {
+            const savedState = JSON.parse(localStorage.getItem('japan_travel_achievements_state'));
+            if (savedState && savedState.theme) document.documentElement.setAttribute('data-theme', savedState.theme);
+        } catch (e) {}
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
 
         :root {
             /* Dark Theme (Default) */
@@ -51,7 +81,24 @@
 
         * {
             box-sizing: border-box;
+        }
+
+        /* Theme-switch color transitions, scoped to key surfaces instead of every element */
+        body, header, .card, .filters-panel, .category-wrapper, .category-header, .category-content,
+        .achievement-card, .badge-item, .region-badge, .prefectures-grid-map,
+        .btn, .select-filter, .search-input, .quick-filter-tag, .toast-notification,
+        .progress-track, .avatar-circle, .avatar-option, .player-name-input,
+        .ach-checkbox-custom, .share-modal-content, .avatar-picker-modal,
+        .category-progress-pill, .rarity-pill, .footer-social-links a {
             transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
 
         body {
@@ -679,6 +726,10 @@
             background-color: var(--accent-red) !important;
             border-color: #fff !important;
             box-shadow: 0 0 10px var(--accent-red);
+        }
+
+        /* Played only on the cell being stamped, not on re-renders */
+        .pref-cell.stamp-anim {
             animation: stampPulse 0.3s ease;
         }
 
@@ -1728,6 +1779,24 @@
             { id: 200, name: "⛩️ 鳥居海景 🌊", desc: "造訪山口縣元乃隅神社或茨城縣大洗磯前神社，拍下海上白色/朱紅鳥居被巨浪拍打的震撼照片。", diff: 6, rarity: "Legendary", cat: "攝影", badgeId: "shrine", hidden: true }
         ];
 
+        // --- 2.5 Shared Category Constants ---
+        const CATEGORIES = ["交通", "美食", "文化", "自然", "住宿", "購物", "攝影", "祭典", "離島", "極限挑戰"];
+        const CATEGORY_EMOJIS = {
+            "交通": "🚄", "美食": "🍣", "文化": "🎭", "自然": "🏔️",
+            "住宿": "🛌", "購物": "🛒", "攝影": "📸", "祭典": "🏮",
+            "離島": "🚢", "極限挑戰": "🌋"
+        };
+
+        // Completion ratio (0~1) per category, used by both radar charts
+        function getCategoryScores() {
+            const done = new Set(appState.checkedAchievements);
+            return CATEGORIES.map(cat => {
+                const inCat = achievementsData.filter(a => a.cat === cat);
+                const doneCount = inCat.filter(a => done.has(a.id)).length;
+                return inCat.length > 0 ? (doneCount / inCat.length) : 0;
+            });
+        }
+
         // --- 3. App State Variables ---
         let appState = {
             playerName: "日本探險家",
@@ -1984,7 +2053,29 @@
                 try {
                     const parsed = JSON.parse(e.target.result);
                     if (Array.isArray(parsed.checkedAchievements) && Array.isArray(parsed.visitedPrefectures)) {
-                        appState = { ...appState, ...parsed };
+                        // Whitelist known fields and drop invalid ids instead of merging arbitrary keys
+                        const validAchIds = new Set(achievementsData.map(a => a.id));
+                        const validPrefIds = new Set(prefecturesData.map(p => p.id));
+                        appState.checkedAchievements = parsed.checkedAchievements.filter(id => validAchIds.has(id));
+                        appState.visitedPrefectures = parsed.visitedPrefectures.filter(id => validPrefIds.has(id));
+                        if (typeof parsed.playerName === 'string' && parsed.playerName.trim()) {
+                            appState.playerName = parsed.playerName.trim().slice(0, 15);
+                        }
+                        if (typeof parsed.playerAvatar === 'string' && avatars.includes(parsed.playerAvatar)) {
+                            appState.playerAvatar = parsed.playerAvatar;
+                        }
+                        if (parsed.theme === 'light' || parsed.theme === 'dark') {
+                            appState.theme = parsed.theme;
+                            document.documentElement.setAttribute('data-theme', appState.theme);
+                            updateThemeButtonUI();
+                        }
+                        if (typeof parsed.registered === 'boolean') {
+                            appState.registered = parsed.registered;
+                        }
+
+                        document.getElementById('playerName').value = appState.playerName;
+                        document.getElementById('playerAvatar').textContent = appState.playerAvatar;
+
                         saveState();
                         updateUI();
                         showNotification("導入成功", "你的旅遊進度已完全恢復", "📥");
@@ -1996,6 +2087,7 @@
                 }
             };
             reader.readAsText(file);
+            event.target.value = '';
         }
 
         // --- 8. Level & Title System ---
@@ -2020,8 +2112,9 @@
             if (!badge) return { unlocked: false, count: 0, total: 0 };
             
             // Filter all achievements linked to this badge
+            const done = new Set(appState.checkedAchievements);
             const targetAchs = achievementsData.filter(a => a.badgeId === badgeId);
-            const completedCount = targetAchs.filter(a => appState.checkedAchievements.includes(a.id)).length;
+            const completedCount = targetAchs.filter(a => done.has(a.id)).length;
             
             return {
                 unlocked: completedCount >= badge.threshold,
@@ -2031,27 +2124,51 @@
         }
 
         // --- 10. Prefectures Map Rendering & Logic ---
+        // Cells are built once; later updates only toggle classes so the stamp
+        // animation plays exclusively on the cell being clicked.
+        let prefCellMap = {};
+
         function renderMap() {
             const mapContainer = document.getElementById('japanPrefMap');
             if (!mapContainer) return;
             mapContainer.innerHTML = '';
+            prefCellMap = {};
 
             // Draw cells based on Grid Row / Col
             prefecturesData.forEach(pref => {
                 const cell = document.createElement('div');
                 cell.className = 'pref-cell';
-                if (appState.visitedPrefectures.includes(pref.id)) {
-                    cell.classList.add('visited');
-                }
-                
                 cell.textContent = pref.name.substring(0, 2);
                 cell.style.gridRow = `${pref.row} / span ${pref.rowSpan || 1}`;
                 cell.style.gridColumn = `${pref.col} / span ${pref.colSpan || 1}`;
                 cell.style.backgroundColor = pref.color + '22';
                 cell.style.borderColor = pref.color;
-                
+                cell.setAttribute('role', 'button');
+                cell.setAttribute('tabindex', '0');
+                cell.setAttribute('aria-label', pref.name);
+
                 cell.onclick = () => togglePrefecture(pref.id);
+                cell.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        togglePrefecture(pref.id);
+                    }
+                };
+                prefCellMap[pref.id] = cell;
                 mapContainer.appendChild(cell);
+            });
+
+            updateMap();
+        }
+
+        function updateMap() {
+            const visited = new Set(appState.visitedPrefectures);
+            prefecturesData.forEach(pref => {
+                const cell = prefCellMap[pref.id];
+                if (!cell) return;
+                const isVisited = visited.has(pref.id);
+                cell.classList.toggle('visited', isVisited);
+                cell.setAttribute('aria-pressed', String(isVisited));
             });
 
             // Draw region widgets
@@ -2061,19 +2178,28 @@
         function togglePrefecture(prefId) {
             const idx = appState.visitedPrefectures.indexOf(prefId);
             const prefObj = prefecturesData.find(p => p.id === prefId);
-            
-            if (idx === -1) {
+            const added = idx === -1;
+
+            if (added) {
                 appState.visitedPrefectures.push(prefId);
                 showNotification("拜訪打卡", `已新增到訪足跡：${prefObj.name}`, "📍");
             } else {
                 appState.visitedPrefectures.splice(idx, 1);
             }
-            
+
             // Check prefecture制霸 hidden achievements
             checkHiddenPrefectureAchievements();
 
             saveState();
             updateUI();
+
+            if (added) {
+                const cell = prefCellMap[prefId];
+                if (cell) {
+                    cell.classList.add('stamp-anim');
+                    cell.addEventListener('animationend', () => cell.classList.remove('stamp-anim'), { once: true });
+                }
+            }
         }
 
         function checkHiddenPrefectureAchievements() {
@@ -2096,7 +2222,7 @@
             const regions = ["北海道", "東北", "關東", "中部", "近畿", "中國", "四國", "九州", "沖繩"];
             
             regions.forEach(reg => {
-                const prefsInReg = prefecturesData.filter(p => p.region === reg || (reg === "九州" && p.region === "九州" && p.id !== "okinawa"));
+                const prefsInReg = prefecturesData.filter(p => p.region === reg);
                 const total = prefsInReg.length;
                 const visited = prefsInReg.filter(p => appState.visitedPrefectures.includes(p.id)).length;
                 const pct = total > 0 ? Math.round((visited / total) * 100) : 0;
@@ -2127,32 +2253,11 @@
         }
 
         // --- 11. HTML5 Canvas Radar Chart Rendering ---
-        function renderRadarChart() {
-            const canvas = document.getElementById('radarCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const categories = ["交通", "美食", "文化", "自然", "住宿", "購物", "攝影", "祭典", "離島", "極限挑戰"];
-            const scores = categories.map(cat => {
-                const inCat = achievementsData.filter(a => a.cat === cat);
-                const done = inCat.filter(a => appState.checkedAchievements.includes(a.id)).length;
-                return inCat.length > 0 ? (done / inCat.length) : 0;
-            });
-
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
-            const r = 90;
-            const numPoints = categories.length;
-
-            const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-            const gridColor = isDark ? 'rgba(42, 71, 94, 0.4)' : 'rgba(230, 220, 208, 0.8)';
-            const labelColor = isDark ? '#c7d5e0' : '#2c2a29';
-            const axisColor = isDark ? 'rgba(42, 71, 94, 0.7)' : 'rgba(230, 220, 208, 1)';
-            const polyFill = isDark ? 'rgba(0, 210, 255, 0.25)' : 'rgba(215, 19, 24, 0.2)';
-            const polyStroke = isDark ? '#00d2ff' : '#d71318';
+        // Shared radar renderer used by both the dashboard chart and the share card
+        function drawRadar(ctx, cx, cy, r, opts) {
+            const scores = getCategoryScores();
+            const numPoints = CATEGORIES.length;
+            const angleAt = (i) => (Math.PI * 2 / numPoints) * i - Math.PI / 2;
 
             // Draw concentric web rings
             const rings = 4;
@@ -2160,83 +2265,102 @@
                 const radius = (r / rings) * j;
                 ctx.beginPath();
                 for (let i = 0; i < numPoints; i++) {
-                    const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
-                    const x = cx + Math.cos(angle) * radius;
-                    const y = cy + Math.sin(angle) * radius;
+                    const x = cx + Math.cos(angleAt(i)) * radius;
+                    const y = cy + Math.sin(angleAt(i)) * radius;
                     if (i === 0) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 }
                 ctx.closePath();
-                ctx.strokeStyle = gridColor;
+                ctx.strokeStyle = opts.gridColor;
                 ctx.lineWidth = 1;
                 ctx.stroke();
             }
 
-            // Draw axis lines and labels
-            ctx.font = 'bold 11px sans-serif';
+            // Draw axis lines (dashboard chart only)
+            if (opts.axisColor) {
+                for (let i = 0; i < numPoints; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(cx + Math.cos(angleAt(i)) * r, cy + Math.sin(angleAt(i)) * r);
+                    ctx.strokeStyle = opts.axisColor;
+                    ctx.stroke();
+                }
+            }
+
+            // Draw labels
+            ctx.font = opts.labelFont;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            
-            const emojis = {
-                "交通": "🚄", "美食": "🍣", "文化": "🎭", "自然": "🏔️", 
-                "住宿": "🛌", "購物": "🛒", "攝影": "📸", "祭典": "🏮", 
-                "離島": "🚢", "極限挑戰": "🌋"
-            };
-
             for (let i = 0; i < numPoints; i++) {
-                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
-                const xAxis = cx + Math.cos(angle) * r;
-                const yAxis = cy + Math.sin(angle) * r;
-                
-                // Draw axis
-                ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.lineTo(xAxis, yAxis);
-                ctx.strokeStyle = axisColor;
-                ctx.stroke();
-
-                // Draw label with offset
-                const labelDist = r + 20;
-                const xLabel = cx + Math.cos(angle) * labelDist;
-                const yLabel = cy + Math.sin(angle) * (labelDist + 4);
-                
-                ctx.fillStyle = labelColor;
-                ctx.fillText(`${emojis[categories[i]]}${categories[i]}`, xLabel, yLabel);
+                const xLabel = cx + Math.cos(angleAt(i)) * opts.labelDist;
+                const yLabel = cy + Math.sin(angleAt(i)) * (opts.labelDist + (opts.labelYExtra || 0));
+                ctx.fillStyle = opts.labelColor;
+                const label = opts.withEmojis ? `${CATEGORY_EMOJIS[CATEGORIES[i]]}${CATEGORIES[i]}` : CATEGORIES[i];
+                ctx.fillText(label, xLabel, yLabel);
             }
 
             // Draw scores polygon
             ctx.beginPath();
             for (let i = 0; i < numPoints; i++) {
-                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
                 const scoreRadius = scores[i] * r;
-                const x = cx + Math.cos(angle) * scoreRadius;
-                const y = cy + Math.sin(angle) * scoreRadius;
-                
+                const x = cx + Math.cos(angleAt(i)) * scoreRadius;
+                const y = cy + Math.sin(angleAt(i)) * scoreRadius;
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             }
             ctx.closePath();
-            ctx.fillStyle = polyFill;
+            ctx.fillStyle = opts.polyFill;
             ctx.fill();
-            ctx.strokeStyle = polyStroke;
-            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = opts.polyStroke;
+            ctx.lineWidth = opts.polyLineWidth || 2;
             ctx.stroke();
 
-            // Draw dots on polygon vertices
-            for (let i = 0; i < numPoints; i++) {
-                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
-                const scoreRadius = scores[i] * r;
-                const x = cx + Math.cos(angle) * scoreRadius;
-                const y = cy + Math.sin(angle) * scoreRadius;
-                
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                ctx.fillStyle = polyStroke;
-                ctx.fill();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = '#fff';
-                ctx.stroke();
+            // Draw dots on polygon vertices (dashboard chart only)
+            if (opts.withDots) {
+                for (let i = 0; i < numPoints; i++) {
+                    const scoreRadius = scores[i] * r;
+                    const x = cx + Math.cos(angleAt(i)) * scoreRadius;
+                    const y = cy + Math.sin(angleAt(i)) * scoreRadius;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = opts.polyStroke;
+                    ctx.fill();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = '#fff';
+                    ctx.stroke();
+                }
             }
+        }
+
+        function renderRadarChart() {
+            const canvas = document.getElementById('radarCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            // Render at device pixel ratio so the chart stays sharp on hi-DPI screens
+            const size = 300;
+            const dpr = window.devicePixelRatio || 1;
+            if (canvas.width !== size * dpr) {
+                canvas.width = size * dpr;
+                canvas.height = size * dpr;
+            }
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, size, size);
+
+            const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+            drawRadar(ctx, size / 2, size / 2, 90, {
+                gridColor: isDark ? 'rgba(42, 71, 94, 0.4)' : 'rgba(230, 220, 208, 0.8)',
+                axisColor: isDark ? 'rgba(42, 71, 94, 0.7)' : 'rgba(230, 220, 208, 1)',
+                labelColor: isDark ? '#c7d5e0' : '#2c2a29',
+                polyFill: isDark ? 'rgba(0, 210, 255, 0.25)' : 'rgba(215, 19, 24, 0.2)',
+                polyStroke: isDark ? '#00d2ff' : '#d71318',
+                labelFont: 'bold 11px sans-serif',
+                labelDist: 110,
+                labelYExtra: 4,
+                withEmojis: true,
+                withDots: true,
+                polyLineWidth: 2.5
+            });
         }
 
         // --- 12. Profile customization ---
@@ -2281,7 +2405,6 @@
             saveState();
             updateThemeButtonUI();
             renderRadarChart();
-            renderMap();
         }
 
         function updateThemeButtonUI() {
@@ -2298,6 +2421,9 @@
         }
 
         // --- 14. Filtering Achievements ---
+        // Debounced so CJK IME composition and fast typing don't re-render 200 cards per keystroke
+        let searchDebounceTimer = null;
+
         function handleSearch(val) {
             activeFilters.search = val.toLowerCase().trim();
             const btn = document.getElementById('clearSearchBtn');
@@ -2306,7 +2432,8 @@
             } else {
                 btn.style.display = 'none';
             }
-            filterAchievements();
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(filterAchievements, 150);
         }
 
         function clearSearch() {
@@ -2337,8 +2464,8 @@
             const container = document.getElementById('achievementsContainer');
             if (!container) return;
 
-            const categories = ["交通", "美食", "文化", "自然", "住宿", "購物", "攝影", "祭典", "離島", "極限挑戰"];
-            
+            const done = new Set(appState.checkedAchievements);
+
             const collStatus = {};
             document.querySelectorAll('.category-wrapper').forEach(wrapper => {
                 const cat = wrapper.getAttribute('data-category');
@@ -2347,10 +2474,10 @@
 
             container.innerHTML = '';
 
-            categories.forEach(cat => {
+            CATEGORIES.forEach(cat => {
                 const inCat = achievementsData.filter(a => a.cat === cat);
                 const totalInCat = inCat.length;
-                const completedInCat = inCat.filter(a => appState.checkedAchievements.includes(a.id)).length;
+                const completedInCat = inCat.filter(a => done.has(a.id)).length;
 
                 const filteredInCat = inCat.filter(ach => {
                     if (activeFilters.search.length > 0) {
@@ -2373,7 +2500,7 @@
                     }
 
                     if (activeFilters.status !== 'all') {
-                        const isDone = appState.checkedAchievements.includes(ach.id);
+                        const isDone = done.has(ach.id);
                         if (activeFilters.status === 'completed' && !isDone) return false;
                         if (activeFilters.status === 'uncompleted' && isDone) return false;
                     }
@@ -2415,7 +2542,7 @@
                 grid.className = 'achievements-grid';
 
                 filteredInCat.forEach(ach => {
-                    const isDone = appState.checkedAchievements.includes(ach.id);
+                    const isDone = done.has(ach.id);
                     const card = document.createElement('div');
                     card.className = `achievement-card ${isDone ? 'completed' : ''} ${ach.hidden ? 'hidden-ach' : ''}`;
                     card.setAttribute('data-id', ach.id);
@@ -2466,12 +2593,7 @@
         }
 
         function getCategoryEmoji(cat) {
-            const emo = {
-                "交通": "🚄", "美食": "🍣", "文化": "🎭", "自然": "🏔️", 
-                "住宿": "🛌", "購物": "🛒", "攝影": "📸", "祭典": "🏮", 
-                "離島": "🚢", "極限挑戰": "🌋"
-            };
-            return emo[cat] || "🧭";
+            return CATEGORY_EMOJIS[cat] || "🧭";
         }
 
         // --- 16. Badge & Achievement Unlock Engine ---
@@ -2509,17 +2631,21 @@
             }
         }
 
-        function checkBadgeUnlocks() {
+        // silent=true syncs badge states without toasts (used on page load so
+        // previously unlocked badges don't replay their notifications)
+        function checkBadgeUnlocks(silent = false) {
             let activeCount = 0;
             badgeData.forEach(badge => {
                 const stat = getBadgeProgress(badge.id);
                 const badgeEl = document.getElementById(`badge-${badge.id}`);
-                
+
                 if (badgeEl) {
                     if (stat.unlocked) {
                         if (!badgeEl.classList.contains('unlocked')) {
                             badgeEl.classList.add('unlocked');
-                            showNotification("解鎖榮譽徽章！", `${badge.emoji} [${badge.name}] 已加入收藏牆`, "🏆");
+                            if (!silent) {
+                                showNotification("解鎖榮譽徽章！", `${badge.emoji} [${badge.name}] 已加入收藏牆`, "🏆");
+                            }
                         }
                         activeCount++;
                     } else {
@@ -2545,7 +2671,7 @@
                 grid.appendChild(el);
             });
 
-            checkBadgeUnlocks();
+            checkBadgeUnlocks(true);
         }
 
         // --- 17. Master UI Layout Synchronizer ---
@@ -2563,12 +2689,22 @@
             document.getElementById('playerLevelProgress').style.width = `${pctXP}%`;
 
             renderRadarChart();
-            renderMap();
+            updateMap();
             renderAchievements();
             checkBadgeUnlocks();
         }
 
         // --- 18. Share Achievement Card Exporter (Canvas) ---
+        // Truncate text with an ellipsis so long names/descriptions stay inside their boxes
+        function truncateToWidth(ctx, text, maxWidth) {
+            if (ctx.measureText(text).width <= maxWidth) return text;
+            let t = text;
+            while (t.length > 0 && ctx.measureText(t + '…').width > maxWidth) {
+                t = t.slice(0, -1);
+            }
+            return t + '…';
+        }
+
         function generateShareCard() {
             const backdrop = document.getElementById('shareModalBackdrop');
             const canvas = document.getElementById('sharingPreviewCanvas');
@@ -2647,7 +2783,7 @@
             ctx.textAlign = 'left';
             ctx.font = 'bold 28px sans-serif';
             ctx.fillStyle = isDark ? '#ffffff' : '#2c2a29';
-            ctx.fillText(appState.playerName, 230, 195);
+            ctx.fillText(truncateToWidth(ctx, appState.playerName, 225), 230, 195);
             
             const lvlDetails = getLevelDetails(appState.checkedAchievements.length);
             ctx.font = 'bold 16px sans-serif';
@@ -2685,60 +2821,14 @@
             ctx.fillStyle = isDark ? '#c7d5e0' : '#2c2a29';
             ctx.fillText('📊 分類探索度', 60, 330);
 
-            const rcx = 220, rcy = 510, rr = 100;
-            const categories = ["交通", "美食", "文化", "自然", "住宿", "購物", "攝影", "祭典", "離島", "極限挑戰"];
-            const scores = categories.map(cat => {
-                const inCat = achievementsData.filter(a => a.cat === cat);
-                const done = inCat.filter(a => appState.checkedAchievements.includes(a.id)).length;
-                return inCat.length > 0 ? (done / inCat.length) : 0;
+            drawRadar(ctx, 220, 510, 100, {
+                gridColor: isDark ? 'rgba(42, 71, 94, 0.4)' : 'rgba(230, 220, 208, 0.8)',
+                labelColor: isDark ? '#c7d5e0' : '#2c2a29',
+                polyFill: isDark ? 'rgba(0, 210, 255, 0.25)' : 'rgba(215, 19, 24, 0.2)',
+                polyStroke: isDark ? '#00d2ff' : '#d71318',
+                labelFont: 'bold 14px sans-serif',
+                labelDist: 124
             });
-            const numPoints = categories.length;
-
-            const gridColor = isDark ? 'rgba(42, 71, 94, 0.4)' : 'rgba(230, 220, 208, 0.8)';
-            const labelColor = isDark ? '#c7d5e0' : '#2c2a29';
-            const polyFill = isDark ? 'rgba(0, 210, 255, 0.25)' : 'rgba(215, 19, 24, 0.2)';
-            const polyStroke = isDark ? '#00d2ff' : '#d71318';
-
-            for (let j = 1; j <= 4; j++) {
-                const rad = (rr / 4) * j;
-                ctx.beginPath();
-                for (let i = 0; i < numPoints; i++) {
-                    const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
-                    const x = rcx + Math.cos(angle) * rad;
-                    const y = rcy + Math.sin(angle) * rad;
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.closePath();
-                ctx.strokeStyle = gridColor;
-                ctx.stroke();
-            }
-            ctx.font = 'bold 14px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            for (let i = 0; i < numPoints; i++) {
-                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
-                const labelDist = rr + 24;
-                const xLabel = rcx + Math.cos(angle) * labelDist;
-                const yLabel = rcy + Math.sin(angle) * labelDist;
-                ctx.fillStyle = labelColor;
-                ctx.fillText(categories[i], xLabel, yLabel);
-            }
-            ctx.beginPath();
-            for (let i = 0; i < numPoints; i++) {
-                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
-                const scoreRadius = scores[i] * rr;
-                const x = rcx + Math.cos(angle) * scoreRadius;
-                const y = rcy + Math.sin(angle) * scoreRadius;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            }
-            ctx.closePath();
-            ctx.fillStyle = polyFill;
-            ctx.fill();
-            ctx.strokeStyle = polyStroke;
-            ctx.lineWidth = 2;
-            ctx.stroke();
 
             ctx.textAlign = 'left';
             ctx.font = 'bold 20px sans-serif';
@@ -2806,7 +2896,7 @@
                     const ach = showcase[i];
                     ctx.font = 'bold 18px sans-serif';
                     ctx.fillStyle = isDark ? '#ffffff' : '#2c2a29';
-                    ctx.fillText(ach.name, 90, achY + 40);
+                    ctx.fillText(truncateToWidth(ctx, ach.name, 215), 90, achY + 40);
 
                     const starsText = '★'.repeat(ach.diff) + '☆'.repeat(5 - Math.min(ach.diff, 5));
                     ctx.font = '12px sans-serif';
@@ -2819,7 +2909,7 @@
 
                     ctx.font = '13px sans-serif';
                     ctx.fillStyle = isDark ? '#c7d5e0' : '#5a5754';
-                    ctx.fillText(ach.desc, 320, achY + 40);
+                    ctx.fillText(truncateToWidth(ctx, ach.desc, 400), 320, achY + 40);
                     ctx.fillText(`分類：${ach.cat}`, 320, achY + 70);
                 } else {
                     ctx.font = 'italic 16px sans-serif';
@@ -2924,11 +3014,33 @@
         }
 
         // --- 19. Initializer ---
-        window.onload = function() {
+        function initApp() {
             loadState();
+            renderMap();
             renderBadgeWall();
+
+            // Keyboard access for the quick filter tags
+            document.querySelectorAll('.quick-filter-tag').forEach(tag => {
+                tag.setAttribute('role', 'button');
+                tag.setAttribute('tabindex', '0');
+                tag.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        tag.click();
+                    }
+                };
+            });
+
             updateUI();
-        };
+        }
+
+        // Run on DOMContentLoaded instead of window.onload so the app is
+        // interactive without waiting for fonts/images to finish loading
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
     </script>
 
     <!-- Character Registration Modal -->
