@@ -1284,6 +1284,50 @@
             flex-grow: 1;
         }
 
+        /* Social share intent buttons inside the share modal */
+        .share-social-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .share-social-label {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-secondary);
+        }
+
+        .social-share-btn {
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .social-share-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .social-share-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-color-active);
+            color: var(--border-color-active);
+            box-shadow: 0 4px 10px var(--shadow-glow);
+        }
+
     </style>
 </head>
 <body>
@@ -1478,6 +1522,24 @@
                 你可以將此圖卡分享到社交媒體（如 Threads, IG 等），向大家炫耀你的日本旅遊歷練！
             </p>
             <canvas id="sharingPreviewCanvas" width="800" height="1200"></canvas>
+            <div class="share-social-row">
+                <span class="share-social-label">分享到：</span>
+                <button class="social-share-btn" onclick="shareToSocial('instagram')" title="分享到 Instagram" aria-label="分享到 Instagram">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </button>
+                <button class="social-share-btn" onclick="shareToSocial('x')" title="分享到 X (Twitter)" aria-label="分享到 X (Twitter)">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+                </button>
+                <button class="social-share-btn" onclick="shareToSocial('threads')" title="分享到 Threads" aria-label="分享到 Threads">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/></svg>
+                </button>
+                <button class="social-share-btn" onclick="shareToSocial('line')" title="分享到 LINE" aria-label="分享到 LINE">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+                </button>
+                <button class="social-share-btn" onclick="shareToSocial('facebook')" title="分享到 Facebook" aria-label="分享到 Facebook">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </button>
+            </div>
             <div class="share-actions">
                 <button class="btn btn-accent" onclick="downloadShareCard()">下載 PNG 圖片</button>
                 <button class="btn" onclick="closeShareModal()">取消</button>
@@ -2456,81 +2518,44 @@
             activeFilters.rarity = document.getElementById('rarityFilter').value;
             activeFilters.status = document.getElementById('statusFilter').value;
 
-            renderAchievements();
+            applyFilters();
         }
 
         // --- 15. Achievements Core Render Engine ---
-        function renderAchievements() {
+        // Cards are built once at startup; afterwards only classes and text are
+        // updated in place, so toggling or filtering never rebuilds the DOM.
+        const achievementsByCat = {};
+        CATEGORIES.forEach(cat => {
+            achievementsByCat[cat] = achievementsData.filter(a => a.cat === cat);
+        });
+
+        let achCardRefs = {};   // achievement id -> { card, checkbox, nameEl, descEl, overlay, searchText }
+        let categoryRefs = {};  // category name -> { wrapper, pill }
+
+        function buildAchievements() {
             const container = document.getElementById('achievementsContainer');
             if (!container) return;
 
-            const done = new Set(appState.checkedAchievements);
-
-            const collStatus = {};
-            document.querySelectorAll('.category-wrapper').forEach(wrapper => {
-                const cat = wrapper.getAttribute('data-category');
-                collStatus[cat] = wrapper.classList.contains('collapsed');
-            });
-
             container.innerHTML = '';
+            achCardRefs = {};
+            categoryRefs = {};
 
             CATEGORIES.forEach(cat => {
-                const inCat = achievementsData.filter(a => a.cat === cat);
-                const totalInCat = inCat.length;
-                const completedInCat = inCat.filter(a => done.has(a.id)).length;
-
-                const filteredInCat = inCat.filter(ach => {
-                    if (activeFilters.search.length > 0) {
-                        const mName = ach.name.toLowerCase().includes(activeFilters.search);
-                        const mDesc = ach.desc.toLowerCase().includes(activeFilters.search);
-                        let mPref = false;
-                        const matchPrefs = prefecturesData.filter(p => p.region.includes(activeFilters.search) || p.name.includes(activeFilters.search));
-                        if (matchPrefs.length > 0) {
-                            mPref = matchPrefs.some(p => ach.desc.includes(p.name) || ach.name.includes(p.name));
-                        }
-                        if (!mName && !mDesc && !mPref) return false;
-                    }
-
-                    if (activeFilters.diff !== 'all') {
-                        if (ach.diff !== parseInt(activeFilters.diff)) return false;
-                    }
-
-                    if (activeFilters.rarity !== 'all') {
-                        if (ach.rarity !== activeFilters.rarity) return false;
-                    }
-
-                    if (activeFilters.status !== 'all') {
-                        const isDone = done.has(ach.id);
-                        if (activeFilters.status === 'completed' && !isDone) return false;
-                        if (activeFilters.status === 'uncompleted' && isDone) return false;
-                    }
-
-                    if (activeFilters.badge !== 'all') {
-                        if (ach.badgeId !== activeFilters.badge) return false;
-                    }
-
-                    return true;
-                });
-
-                if (filteredInCat.length === 0) return;
+                const inCat = achievementsByCat[cat];
 
                 const wrapper = document.createElement('div');
                 wrapper.className = 'category-wrapper';
                 wrapper.setAttribute('data-category', cat);
-                if (collStatus[cat] !== undefined ? collStatus[cat] : false) {
-                    wrapper.classList.add('collapsed');
-                }
 
                 const header = document.createElement('div');
                 header.className = 'category-header';
                 header.innerHTML = `
                     <div class="category-info">
                         <span class="category-title">${getCategoryEmoji(cat)} ${cat}</span>
-                        <span class="category-progress-pill">${completedInCat} / ${totalInCat}</span>
+                        <span class="category-progress-pill">0 / ${inCat.length}</span>
                     </div>
                     <span class="category-toggle-icon">▼</span>
                 `;
-                
                 header.onclick = () => {
                     wrapper.classList.toggle('collapsed');
                 };
@@ -2541,17 +2566,16 @@
                 const grid = document.createElement('div');
                 grid.className = 'achievements-grid';
 
-                filteredInCat.forEach(ach => {
-                    const isDone = done.has(ach.id);
+                inCat.forEach(ach => {
                     const card = document.createElement('div');
-                    card.className = `achievement-card ${isDone ? 'completed' : ''} ${ach.hidden ? 'hidden-ach' : ''}`;
+                    card.className = 'achievement-card';
                     card.setAttribute('data-id', ach.id);
-                    
+
                     const stars = '★'.repeat(ach.diff) + '☆'.repeat(5 - Math.min(ach.diff, 5));
-                    
-                    let htmlContent = `
+
+                    card.innerHTML = `
                         <div class="ach-checkbox-container">
-                            <input type="checkbox" class="ach-checkbox" ${isDone ? 'checked' : ''} onchange="toggleAchievement(${ach.id})">
+                            <input type="checkbox" class="ach-checkbox">
                             <span class="ach-checkbox-custom"></span>
                         </div>
                         <div class="ach-info">
@@ -2559,29 +2583,37 @@
                                 <span class="ach-difficulty-stars">${stars}</span>
                                 <span class="rarity-pill rarity-${ach.rarity.toLowerCase()}">${ach.rarity}</span>
                             </div>
-                            <div class="ach-name">${ach.hidden && !isDone ? '??? 隱藏成就' : ach.name}</div>
-                            <div class="ach-desc">${ach.hidden && !isDone ? '解鎖或滑鼠懸停以揭曉內容。' : ach.desc}</div>
+                            <div class="ach-name"></div>
+                            <div class="ach-desc"></div>
                         </div>
+                        ${ach.hidden ? '<div class="hidden-overlay"><span>🔒 STEAM 隱藏成就</span></div>' : ''}
                     `;
 
-                    if (ach.hidden && !isDone) {
-                        htmlContent += `
-                            <div class="hidden-overlay">
-                                <span>🔒 STEAM 隱藏成就</span>
-                            </div>
-                        `;
-                    }
+                    const checkbox = card.querySelector('.ach-checkbox');
+                    checkbox.onchange = () => toggleAchievement(ach.id);
 
-                    card.innerHTML = htmlContent;
-                    
                     card.onclick = (e) => {
                         if (e.target.tagName !== 'INPUT') {
-                            const cb = card.querySelector('.ach-checkbox');
-                            cb.checked = !cb.checked;
+                            checkbox.checked = !checkbox.checked;
                             toggleAchievement(ach.id);
                         }
                     };
 
+                    const nameEl = card.querySelector('.ach-name');
+                    const descEl = card.querySelector('.ach-desc');
+                    if (!ach.hidden) {
+                        nameEl.textContent = ach.name;
+                        descEl.textContent = ach.desc;
+                    }
+
+                    achCardRefs[ach.id] = {
+                        card,
+                        checkbox,
+                        nameEl,
+                        descEl,
+                        overlay: card.querySelector('.hidden-overlay'),
+                        searchText: (ach.name + '\n' + ach.desc).toLowerCase()
+                    };
                     grid.appendChild(card);
                 });
 
@@ -2589,6 +2621,78 @@
                 wrapper.appendChild(header);
                 wrapper.appendChild(content);
                 container.appendChild(wrapper);
+
+                categoryRefs[cat] = {
+                    wrapper,
+                    pill: header.querySelector('.category-progress-pill')
+                };
+            });
+        }
+
+        // Sync each card's completed/hidden state and category counters in place
+        function updateAchievementsUI() {
+            const done = new Set(appState.checkedAchievements);
+
+            achievementsData.forEach(ach => {
+                const refs = achCardRefs[ach.id];
+                if (!refs) return;
+                const isDone = done.has(ach.id);
+
+                refs.checkbox.checked = isDone;
+                refs.card.classList.toggle('completed', isDone);
+
+                if (ach.hidden) {
+                    refs.card.classList.toggle('hidden-ach', !isDone);
+                    refs.nameEl.textContent = isDone ? ach.name : '??? 隱藏成就';
+                    refs.descEl.textContent = isDone ? ach.desc : '解鎖或滑鼠懸停以揭曉內容。';
+                    if (refs.overlay) refs.overlay.style.display = isDone ? 'none' : '';
+                }
+            });
+
+            CATEGORIES.forEach(cat => {
+                const inCat = achievementsByCat[cat];
+                const completedInCat = inCat.filter(a => done.has(a.id)).length;
+                categoryRefs[cat].pill.textContent = `${completedInCat} / ${inCat.length}`;
+            });
+
+            applyFilters(done);
+        }
+
+        function matchesFilters(ach, done, matchPrefNames) {
+            if (activeFilters.search.length > 0) {
+                const textMatch = achCardRefs[ach.id].searchText.includes(activeFilters.search);
+                const prefMatch = matchPrefNames.some(n => ach.desc.includes(n) || ach.name.includes(n));
+                if (!textMatch && !prefMatch) return false;
+            }
+
+            if (activeFilters.diff !== 'all' && ach.diff !== parseInt(activeFilters.diff)) return false;
+            if (activeFilters.rarity !== 'all' && ach.rarity !== activeFilters.rarity) return false;
+
+            if (activeFilters.status !== 'all') {
+                const isDone = done.has(ach.id);
+                if (activeFilters.status === 'completed' && !isDone) return false;
+                if (activeFilters.status === 'uncompleted' && isDone) return false;
+            }
+
+            if (activeFilters.badge !== 'all' && ach.badgeId !== activeFilters.badge) return false;
+
+            return true;
+        }
+
+        function applyFilters(done = new Set(appState.checkedAchievements)) {
+            // Prefecture/region names matching the search term, resolved once per pass
+            const matchPrefNames = activeFilters.search.length > 0
+                ? prefecturesData.filter(p => p.region.includes(activeFilters.search) || p.name.includes(activeFilters.search)).map(p => p.name)
+                : [];
+
+            CATEGORIES.forEach(cat => {
+                let visibleCount = 0;
+                achievementsByCat[cat].forEach(ach => {
+                    const visible = matchesFilters(ach, done, matchPrefNames);
+                    achCardRefs[ach.id].card.classList.toggle('hidden-element', !visible);
+                    if (visible) visibleCount++;
+                });
+                categoryRefs[cat].wrapper.classList.toggle('hidden-element', visibleCount === 0);
             });
         }
 
@@ -2604,17 +2708,6 @@
             if (idx === -1) {
                 appState.checkedAchievements.push(id);
                 showNotification("成就解除！", ach.name, "🏆");
-                
-                if (ach.hidden) {
-                    setTimeout(() => {
-                        const card = document.querySelector(`.achievement-card[data-id="${id}"]`);
-                        if (card) {
-                            card.classList.remove('hidden-ach');
-                            const overlay = card.querySelector('.hidden-overlay');
-                            if (overlay) overlay.remove();
-                        }
-                    }, 500);
-                }
             } else {
                 appState.checkedAchievements.splice(idx, 1);
             }
@@ -2690,7 +2783,7 @@
 
             renderRadarChart();
             updateMap();
-            renderAchievements();
+            updateAchievementsUI();
             checkBadgeUnlocks();
         }
 
@@ -2942,15 +3035,75 @@
             document.getElementById('shareModalBackdrop').style.display = 'none';
         }
 
-        function downloadShareCard() {
+        function triggerCardDownload() {
             const canvas = document.getElementById('sharingPreviewCanvas');
-            const url = canvas.toDataURL('image/png');
             const a = document.createElement('a');
-            a.href = url;
+            a.href = canvas.toDataURL('image/png');
             a.download = `japan_travel_achievement_${appState.playerName}.png`;
             a.click();
+        }
+
+        function downloadShareCard() {
+            triggerCardDownload();
             closeShareModal();
             showNotification("圖卡下載成功", "歡迎分享到 Threads 或 Instagram！", "📸");
+        }
+
+        // --- 18.5 Social Share Intents ---
+        const SHARE_URL = 'https://ivanusto.github.io/japan-travel-achievement-list/';
+
+        function buildShareText() {
+            const achCount = appState.checkedAchievements.length;
+            const prefCount = appState.visitedPrefectures.length;
+            return `我在「日本旅行成就系統」解鎖了 ${achCount}/200 項成就、踩點 ${prefCount}/47 個都道府縣！快來挑戰你的日本旅行足跡 🇯🇵`;
+        }
+
+        function shareToSocial(platform) {
+            const text = buildShareText();
+            let shareLink = '';
+
+            switch (platform) {
+                case 'x':
+                    shareLink = `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(SHARE_URL)}`;
+                    break;
+                case 'threads':
+                    shareLink = `https://www.threads.net/intent/post?text=${encodeURIComponent(text + '\n' + SHARE_URL)}`;
+                    break;
+                case 'facebook':
+                    shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SHARE_URL)}&quote=${encodeURIComponent(text)}`;
+                    break;
+                case 'line':
+                    shareLink = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(SHARE_URL)}&text=${encodeURIComponent(text)}`;
+                    break;
+                case 'instagram':
+                    shareToInstagram();
+                    return;
+                default:
+                    return;
+            }
+            window.open(shareLink, '_blank', 'noopener');
+        }
+
+        // Instagram has no web share intent: hand the PNG to the native share
+        // sheet on mobile (where the IG app appears), otherwise download the
+        // card and prompt the user to upload it manually.
+        function shareToInstagram() {
+            const canvas = document.getElementById('sharingPreviewCanvas');
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+            canvas.toBlob(async (blob) => {
+                if (blob && isMobile && navigator.canShare) {
+                    const file = new File([blob], 'japan_travel_achievement.png', { type: 'image/png' });
+                    if (navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({ files: [file], text: buildShareText() });
+                        } catch (e) { /* user closed the share sheet */ }
+                        return;
+                    }
+                }
+                triggerCardDownload();
+                showNotification("圖卡已下載", "Instagram 不支援網頁分享，請開啟 IG App 上傳圖卡", "📸");
+            }, 'image/png');
         }
 
         // --- Character Registration ---
@@ -3018,6 +3171,7 @@
             loadState();
             renderMap();
             renderBadgeWall();
+            buildAchievements();
 
             // Keyboard access for the quick filter tags
             document.querySelectorAll('.quick-filter-tag').forEach(tag => {
