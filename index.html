@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日本旅行成就系統 Ultimate Edition</title>
-    <meta name="description" content="200 項日本旅遊成就打卡、47 都道府縣足跡地圖、榮譽徽章牆與探索雷達圖，一鍵生成可分享的旅行成就卡。進度自動保存在瀏覽器，免安裝免註冊。">
+    <meta name="description" content="202 項日本旅遊成就打卡、47 都道府縣足跡地圖、榮譽徽章牆與探索雷達圖，一鍵生成可分享的旅行成就卡。進度自動保存在瀏覽器，免安裝免註冊。">
     <meta name="theme-color" content="#12181f">
     <link rel="canonical" href="https://ivanusto.github.io/japan-travel-achievement-list/">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛩️</text></svg>">
@@ -13,7 +13,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="日本旅行成就系統 Ultimate Edition">
     <meta property="og:title" content="日本旅行成就系統 Ultimate Edition">
-    <meta property="og:description" content="200 項日本旅遊成就、47 都道府縣足跡地圖、徽章牆與雷達圖，一鍵生成你的日本旅行成就卡！">
+    <meta property="og:description" content="202 項日本旅遊成就、47 都道府縣足跡地圖、徽章牆與雷達圖，一鍵生成你的日本旅行成就卡！">
     <meta property="og:url" content="https://ivanusto.github.io/japan-travel-achievement-list/">
     <meta property="og:image" content="https://ivanusto.github.io/japan-travel-achievement-list/og-image.png">
     <meta property="og:image:width" content="1200">
@@ -21,7 +21,7 @@
     <meta property="og:locale" content="zh_TW">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="日本旅行成就系統 Ultimate Edition">
-    <meta name="twitter:description" content="200 項日本旅遊成就、47 都道府縣足跡地圖、徽章牆與雷達圖，一鍵生成你的日本旅行成就卡！">
+    <meta name="twitter:description" content="202 項日本旅遊成就、47 都道府縣足跡地圖、徽章牆與雷達圖，一鍵生成你的日本旅行成就卡！">
     <meta name="twitter:image" content="https://ivanusto.github.io/japan-travel-achievement-list/og-image.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1707,7 +1707,7 @@
             { id: "okinawa", name: "沖繩", region: "沖繩", row: 12, col: 1, color: "#1679ab" }
         ];
 
-        // --- 2. Complete 200 Achievements Data ---
+        // --- 2. Complete 202 Achievements Data ---
         const achievementsData = [
             // 初心者 ★1 (IDs 1-20)
             { id: 1, name: "看過富士山 🗻", desc: "親眼目睹象徵日本的神聖富士山壯麗輪廓。", diff: 1, rarity: "Common", cat: "自然", badgeId: "nationalpark" },
@@ -1762,6 +1762,7 @@
             { id: 48, name: "逛百貨地下街 (Depachika) 🍰", desc: "在日本高端百貨公司地下食品街，被滿滿的高級便當甜點淹沒。", diff: 2, rarity: "Common", cat: "購物" },
             { id: 49, name: "在 Loft 購物 📒", desc: "在 Loft 尋購極具創意與美感的日本手帳、文具與生活雜貨。", diff: 2, rarity: "Common", cat: "購物" },
             { id: 50, name: "購買日本彩券 🎫", desc: "在街頭的彩券行（チャンスセンター）購買一張刮刮樂或 Jumbo 彩券碰碰運氣。", diff: 2, rarity: "Common", cat: "購物" },
+            { id: 201, name: "享用賽馬場的 B 級美食 🌭", desc: "在賽馬場品嚐道地小食（如煮內臟、炒麵或烤串），體驗熱鬧的競馬美食氛圍。", diff: 2, rarity: "Common", cat: "美食" },
 
             // 探索者 ★3 (IDs 51-95)
             { id: 51, name: "踏上北海道土地 ❄️", desc: "來到日本最北的大地，呼吸北國獨特的開闊氣息。", diff: 3, rarity: "Rare", cat: "離島" },
@@ -1828,7 +1829,7 @@
             { id: 110, name: "去阪神甲子園看棒球 ⚾", desc: "在日本棒球聖地甲子園現場感受高中聯賽的青春熱血或職棒的狂熱應援。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
             { id: 111, name: "現場看一場 J League ⚽", desc: "走進足球體育場，為心儀的日本職業足球聯盟隊伍現場高聲吶喊應援。", diff: 4, rarity: "Epic", cat: "文化" },
             { id: 112, name: "看 NPB 日本職棒賽 ⚾", desc: "在日本巨蛋或露天球場觀賞一場熱鬧的日本職棒賽，大口嚼便當喝啤酒。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
-            { id: 113, name: "去日本賽馬場投注 🏇", desc: "前往東京或京都賽馬場，填寫投注單，體驗群馬奔騰、全場歡呼的心跳快感。", diff: 4, rarity: "Epic", cat: "文化" },
+            { id: 113, name: "前往競馬場購買馬券 🏇", desc: "填寫投注單並購買馬券，體驗群馬奔騰、全場歡呼的心跳快感與獨特賽馬文化。", diff: 4, rarity: "Epic", cat: "文化" },
             { id: 114, name: "制霸日本三大松原 🌲", desc: "走遍日本三大松原：靜岡三保松原、佐賀虹之松原以及京都天橋立松原。", diff: 4, rarity: "Epic", cat: "自然", badgeId: "nationalpark" },
             { id: 115, name: "收集日本三大夜景 🌌", desc: "親臨日本三大夜景（神戶摩耶山、長崎稻佐山、函館山）或新三大夜景之一，俯瞰璀璨燈火。", diff: 4, rarity: "Epic", cat: "攝影" },
             { id: 116, name: "支持地方偶像表演 🎤", desc: "前往地方小型舞台或地下劇場，現場應援極具親切感的地方偶像少女團體。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "anime" },
@@ -1861,6 +1862,7 @@
             { id: 143, name: "海濱公園藍色粉蝶花 🦋", desc: "春季造訪茨城國營常陸海濱公園，拍下山丘上無邊無際的港灣粉蝶花海。", diff: 4, rarity: "Epic", cat: "攝影", badgeId: "nationalpark" },
             { id: 144, name: "足利公園紫藤花瀑布 🍇", desc: "春末仰望樹齡破百年的巨大紫藤架，拍下垂墜數公尺、如雨般落下的夢幻粉紫藤花幕。", diff: 4, rarity: "Epic", cat: "攝影", badgeId: "sakura" },
             { id: 145, name: "拍下名港中央大橋夜景 🌉", desc: "在日落黃昏，架起腳架拍下名港中央大橋在深藍夜色中亮起彩燈的氣勢巨拱。", diff: 4, rarity: "Epic", cat: "攝影" },
+            { id: 202, name: "發現北海道輓曳賽馬 🐎", desc: "造訪北海道帶廣賽馬場，親眼觀看世界唯一的輓曳賽馬（Ban'ei），看巨型輓馬拉著重型鐵橇翻越沙丘。", diff: 4, rarity: "Epic", cat: "文化", badgeId: "culture" },
 
             // 修羅 ★5 (IDs 146-180)
             { id: 146, name: "登頂富士山 🗻", desc: "戴上頭燈背起重裝，深夜行走火山碎石路，並成功登頂劍峰 3776m 迎御來光。", diff: 5, rarity: "Legendary", cat: "極限挑戰", badgeId: "nationalpark" },
