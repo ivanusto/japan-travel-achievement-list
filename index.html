@@ -1404,28 +1404,33 @@
     <div class="app-wrapper">
         <header>
             <div class="header-title-section">
-                <h1>🇯🇵 日本旅行成就系統</h1>
-                <p>探索東瀛足跡 • 解鎖冒險徽章 • 完成你的日本旅行手帳</p>
+                <h1 data-i18n="title">🇯🇵 日本旅行成就系統</h1>
+                <p data-i18n="subtitle">探索東瀛足跡 • 解鎖冒險徽章 • 完成你的日本旅行手帳</p>
             </div>
             <div class="header-controls">
+                <select id="langSelect" class="select-filter" onchange="changeLanguage(this.value)" style="padding: 10px 14px; font-weight: 700; height: 38px;">
+                    <option value="zh-TW">繁體中文</option>
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                </select>
                 <a class="btn" href="https://ivanusto.github.io/travel-achievement-list/" target="_blank" rel="noreferrer noopener" style="text-decoration:none;">
-                    <span>🌍</span> 地球旅行成就系統
+                    <span>🌍</span> <span data-i18n="earthTravelLink">地球旅行成就系統</span>
                 </a>
                 <button class="btn btn-accent" onclick="generateShareCard()">
-                    <span>📸</span> 一鍵分享成就卡
+                    <span>📸</span> <span data-i18n="shareCardBtn">一鍵分享成就卡</span>
                 </button>
                 <button class="btn" id="themeToggleBtn" onclick="toggleTheme()">
-                    <span id="themeToggleIcon">☀️</span> <span id="themeToggleText">切換淺色</span>
+                    <span id="themeToggleIcon">☀️</span> <span id="themeToggleText" data-i18n="themeToggleTextLight">切換淺色</span>
                 </button>
                 <button class="btn" onclick="exportData()">
-                    <span>📤</span> 匯出備份
+                    <span>📤</span> <span data-i18n="exportBtn">匯出備份</span>
                 </button>
                 <button class="btn" onclick="document.getElementById('importFile').click()">
-                    <span>📥</span> 導入備份
+                    <span>📥</span> <span data-i18n="importBtn">導入備份</span>
                 </button>
                 <input type="file" id="importFile" class="hidden-element" accept=".json" onchange="importData(event)">
                 <button class="btn" onclick="resetProgress()" style="color: var(--accent-red); border-color: rgba(255, 0, 60, 0.3);">
-                    <span>🔄</span> 重置
+                    <span>🔄</span> <span data-i18n="resetBtn">重置</span>
                 </button>
             </div>
         </header>
@@ -1461,7 +1466,7 @@
 
                 <!-- Radar Chart Section -->
                 <div class="radar-container">
-                    <div style="font-size: 15px; font-weight: 800; color: var(--text-secondary); width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; text-align: left;">
+                    <div style="font-size: 15px; font-weight: 800; color: var(--text-secondary); width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; text-align: left;" data-i18n="radarChartTitle">
                         📊 分類探索度 (雷達圖)
                     </div>
                     <canvas id="radarCanvas" width="300" height="300"></canvas>
@@ -1470,7 +1475,7 @@
                 <!-- Badge wall -->
                 <div class="badge-wall-container">
                     <div class="badge-title-header">
-                        <span>🏆 徽章展示牆</span>
+                        <span data-i18n="badgeWallTitle">🏆 徽章展示牆</span>
                         <span id="badgeUnlockCount">0 / 13</span>
                     </div>
                     <div class="badge-wall-grid" id="badgeWallGrid"></div>
@@ -1483,7 +1488,7 @@
                 <div class="card">
                     <div class="map-section-header">
                         <div class="map-section-title">
-                            <span>🗾</span> 都道府縣足跡地圖 (<span id="totalPrefPercentage">0%</span>)
+                            <span>🗾</span> <span data-i18n="mapTitle">都道府縣足跡地圖</span> (<span id="totalPrefPercentage">0%</span>)
                         </div>
                         <div style="font-size: 13px; font-weight: 800; color: var(--text-secondary);" id="totalPrefCount">
                             已踩點 0 / 47
@@ -1495,7 +1500,7 @@
                         <div class="map-scroll-wrapper">
                             <div class="prefectures-grid-map" id="japanPrefMap"></div>
                         </div>
-                        <div class="map-scroll-hint">💡 左右滑動以檢視完整日本地圖</div>
+                        <div class="map-scroll-hint" data-i18n="mapScrollHint">💡 左右滑動以檢視完整日本地圖</div>
 
                         <!-- Region Badge stats -->
                         <div class="regions-stats-panel" id="regionsStatsPanel"></div>
@@ -1506,14 +1511,14 @@
                 <div class="card">
                     <div class="map-section-header">
                         <div class="map-section-title">
-                            <span>🌟</span> 我的自訂成就 (<span id="customAchCount">0 / 0</span>)
+                            <span>🌟</span> <span data-i18n="customAchTitle">我的自訂成就</span> (<span id="customAchCount">0 / 0</span>)
                         </div>
                         <button class="btn" id="addCustomAchBtn" onclick="openCustomAchModal()">
-                            <span>➕</span> 新增自訂成就
+                            <span>➕</span> <span data-i18n="addCustomAchBtn">新增自訂成就</span>
                         </button>
                     </div>
                     <div class="achievements-grid" id="customAchGrid"></div>
-                    <div class="custom-ach-empty" id="customAchEmptyHint">
+                    <div class="custom-ach-empty" id="customAchEmptyHint" data-i18n="customAchEmptyHint">
                         還沒有自訂成就。把官方清單沒有、但對你別具意義的旅行時刻記下來吧！（最多 10 個，會計入總成就數與等級）
                     </div>
                 </div>
@@ -1522,37 +1527,37 @@
                 <div class="filters-panel">
                     <div class="filter-row-top">
                         <div class="search-box">
-                            <input type="text" id="searchBar" class="search-input" placeholder="搜尋成就名稱或說明描述..." oninput="handleSearch(this.value)">
+                            <input type="text" id="searchBar" class="search-input" data-i18n="searchPlaceholder" placeholder="搜尋成就名稱或說明描述..." oninput="handleSearch(this.value)">
                             <button class="clear-search-btn" id="clearSearchBtn" onclick="clearSearch()">✕</button>
                         </div>
                         <div class="filter-groups">
                             <select id="diffFilter" class="select-filter" onchange="filterAchievements()">
-                                <option value="all">所有難度</option>
-                                <option value="1">★☆☆☆☆ (新手)</option>
-                                <option value="2">★★☆☆☆ (旅人)</option>
-                                <option value="3">★★★☆☆ (探索者)</option>
-                                <option value="4">★★★★☆ (日本迷)</option>
-                                <option value="5">★★★★★ (修羅)</option>
-                                <option value="6">★★★★★★ (隱藏)</option>
+                                <option value="all" data-i18n="filterAllDiff">所有難度</option>
+                                <option value="1" data-i18n="filterDiff1">★☆☆☆☆ (新手)</option>
+                                <option value="2" data-i18n="filterDiff2">★★☆☆☆ (旅人)</option>
+                                <option value="3" data-i18n="filterDiff3">★★★☆☆ (探索者)</option>
+                                <option value="4" data-i18n="filterDiff4">★★★★☆ (日本迷)</option>
+                                <option value="5" data-i18n="filterDiff5">★★★★★ (修羅)</option>
+                                <option value="6" data-i18n="filterDiff6">★★★★★★ (隱藏)</option>
                             </select>
                             <select id="rarityFilter" class="select-filter" onchange="filterAchievements()">
-                                <option value="all">所有稀有度</option>
+                                <option value="all" data-i18n="filterAllRarity">所有稀有度</option>
                                 <option value="Common">Common</option>
                                 <option value="Rare">Rare</option>
                                 <option value="Epic">Epic</option>
                                 <option value="Legendary">Legendary</option>
                             </select>
                             <select id="statusFilter" class="select-filter" onchange="filterAchievements()">
-                                <option value="all">所有狀態</option>
-                                <option value="completed">已解鎖</option>
-                                <option value="uncompleted">未解鎖</option>
+                                <option value="all" data-i18n="filterAllStatus">所有狀態</option>
+                                <option value="completed" data-i18n="filterStatusCompleted">已解鎖</option>
+                                <option value="uncompleted" data-i18n="filterStatusUncompleted">未解鎖</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="stats-quick-filters">
-                        <span>快速篩選徽章：</span>
-                        <div class="quick-filter-tag active" id="badgeTag-all" onclick="filterByBadge('all')">全部</div>
+                        <span data-i18n="quickFilterLabel">快速篩選徽章：</span>
+                        <div class="quick-filter-tag active" id="badgeTag-all" onclick="filterByBadge('all')" data-i18n="quickFilterAll">全部</div>
                         <div class="quick-filter-tag" id="badgeTag-railfan" onclick="filterByBadge('railfan')">🚄 鐵道迷</div>
                         <div class="quick-filter-tag" id="badgeTag-onsen" onclick="filterByBadge('onsen')">♨️ 溫泉達人</div>
                         <div class="quick-filter-tag" id="badgeTag-sushi" onclick="filterByBadge('sushi')">🍣 壽司王</div>
@@ -1633,6 +1638,432 @@
     </div>
 
     <script>
+        // --- 0. Localization Translation Databases ---
+        const TRANSLATIONS = {
+            "zh-TW": {
+                "title": "日本旅行成就系統",
+                "subtitle": "探索東瀛足跡 • 解鎖冒險徽章 • 完成你的日本旅行手帳",
+                "earthTravelLink": "地球旅行成就系統",
+                "shareCardBtn": "一鍵分享成就卡",
+                "themeToggleTextLight": "切換淺色",
+                "themeToggleTextDark": "切換深色",
+                "exportBtn": "匯出備份",
+                "importBtn": "導入備份",
+                "resetBtn": "重置",
+                "radarChartTitle": "📊 分類探索度 (雷達圖)",
+                "badgeWallTitle": "🏆 徽章展示牆",
+                "mapTitle": "都道府縣足跡地圖",
+                "mapScrollHint": "💡 左右滑動以檢視完整日本地圖",
+                "customAchTitle": "我的自訂成就",
+                "addCustomAchBtn": "新增自訂成就",
+                "customAchEmptyHint": "還沒有自訂成就。把官方清單沒有、但對你別具意義的旅行時刻記下來吧！（最多 10 個，會計入總成就數與等級）",
+                "searchPlaceholder": "搜尋成就名稱或說明描述...",
+                "filterAllDiff": "所有難度",
+                "filterDiff1": "★☆☆☆☆ (新手)",
+                "filterDiff2": "★★☆☆☆ (旅人)",
+                "filterDiff3": "★★★☆☆ (探索者)",
+                "filterDiff4": "★★★★☆ (日本迷)",
+                "filterDiff5": "★★★★★ (修羅)",
+                "filterDiff6": "★★★★★★ (隱藏)",
+                "filterAllRarity": "所有稀有度",
+                "filterAllStatus": "所有狀態",
+                "filterStatusCompleted": "已解鎖",
+                "filterStatusUncompleted": "未解鎖",
+                "quickFilterLabel": "快速篩選徽章：",
+                "quickFilterAll": "全部",
+                "avatarModalTitle": "選擇頭像 Emojis",
+                "closeBtn": "關閉",
+                "shareModalTitle": "📸 生成個人旅行成就卡",
+                "shareModalDesc": "你可以將此圖卡分享到社交媒體（如 Threads, IG 等），向大家炫耀你的日本旅遊歷練！",
+                "shareToLabel": "分享到：",
+                "downloadPngBtn": "下載 PNG 圖片",
+                "cancelBtn": "取消",
+                "customAchModalTitleAdd": "🌟 新增自訂成就",
+                "customAchModalTitleEdit": "✏️ 編輯自訂成就",
+                "customAchNameLabel": "成就名稱（必填，30 字內）",
+                "customAchDescLabel": "成就描述（選填，60 字內）",
+                "customAchDiffLabel": "難度星級",
+                "customAchDiff1": "★☆☆☆☆ (輕鬆達成)",
+                "customAchDiff2": "★★☆☆☆ (小有挑戰)",
+                "customAchDiff3": "★★★☆☆ (需要努力)",
+                "customAchDiff4": "★★★★☆ (相當困難)",
+                "customAchDiff5": "★★★★★ (畢生難忘)",
+                "saveBtn": "儲存",
+                "registerTitle": "🎒 探險家登錄",
+                "registerDesc": "歡迎來到日本旅行成就系統！請為您的手帳進行首次角色登錄：",
+                "registerStep1": "1. 選擇起手頭像",
+                "registerStep2": "2. 輸入您的暱稱",
+                "registerPlaceholder": "例如：日本旅人小明...",
+                "registerBtn": "🎮 登錄完成，開始冒險！",
+                "footerCredit": "© 2026 日本旅行成就系統. All rights reserved. Created with 💖 for Japan Travelers.",
+                "resetConfirm": "⚠️ 確定要重置所有旅遊成就與都道府縣足跡嗎？此動作無法復原！",
+                "resetTitle": "進度重置",
+                "resetDesc": "已清除所有勾選記錄",
+                "importSuccessTitle": "導入成功",
+                "importSuccessDesc": "你的旅遊進度已完全恢復",
+                "importErrorTitle": "導入失敗",
+                "importErrorDesc": "無效的備份檔案格式",
+                "playerNameInputTitle": "點擊修改暱稱",
+                "xpDisplaySuffix": "成就",
+                "prefDisplayPrefix": "已踩點",
+                "prefUnlockTitle": "拜訪打卡",
+                "prefUnlockDesc": "已新增到訪足跡：{name}",
+                "achUnlockTitle": "成就解除！",
+                "customAchAddTitle": "已建立自訂成就",
+                "customAchNameRequired": "請輸入成就名稱！",
+                "customAchDeleteConfirm": "確定要刪除自訂成就「{name}」嗎？",
+                "customAchLimitTitle": "自訂成就上限",
+                "customAchLimitDesc": "最多只能建立 {limit} 個自訂成就",
+                "badgeUnlockTitle": "解鎖榮譽徽章！",
+                "badgeUnlockDesc": "{emoji} [{name}] 已加入收藏牆",
+                "regSuccessTitle": "冒險開始！",
+                "regSuccessDesc": "探險家 {name}，祝您日本旅行愉快！",
+                "shareCardNotifyTitle": "圖卡下載成功",
+                "shareCardNotifyDesc": "歡迎分享到 Threads 或 Instagram！",
+                "igShareNotifyTitle": "圖卡已下載",
+                "igShareNotifyDesc": "Instagram 不支援網頁分享，請開啟 IG App 上傳圖卡",
+                "defaultPlayerName": "日本探險家",
+                "editBtnTitle": "編輯",
+                "deleteBtnTitle": "刪除",
+                "customAchLabel": "自訂",
+                "customAchDefaultDesc": "由你親自訂立的專屬成就。",
+                "levelLabel": "等級",
+                "shareCardTitle": "日本旅行成就記錄卡",
+                "totalUnlockRateLabel": "總成就解鎖率",
+                "mapTitleLabel": "都道府縣足跡",
+                "radarChartTitleLabel": "📊 分類探索度",
+                "badgeWallTitleLabel": "🏆 解鎖榮譽徽章牆",
+                "showcaseTitleLabel": "🌟 最引以為傲的冒險成就",
+                "catLabel": "分類：",
+                "showcaseEmptyLabel": "尚無解鎖此欄位之高級成就，趕快去旅行吧！",
+                
+                // Levels
+                "levelTitle0": "🌱 日本新手",
+                "levelTitle1": "🎒 自助旅行者",
+                "levelTitle2": "✈ 日本探索家",
+                "levelTitle3": "🗾 日本達人",
+                "levelTitle4": "🎌 日本專家",
+                "levelTitle5": "👑 日本國民 (誤)",
+                "levelTitle6": "🏯 日本旅行神",
+                
+                // Categories
+                "cat-交通": "交通", "cat-美食": "美食", "cat-文化": "文化", "cat-自然": "自然", "cat-住宿": "住宿",
+                "cat-購物": "購物", "cat-攝影": "攝影", "cat-祭典": "祭典", "cat-離島": "離島", "cat-極限挑戰": "極限挑戰",
+                
+                // Regions
+                "reg-北海道": "北海道", "reg-東北": "東北", "reg-關東": "關東", "reg-中部": "中部", "reg-近畿": "近畿",
+                "reg-中國": "中國", "reg-四國": "四國", "reg-九州": "九州", "reg-沖繩": "沖繩"
+            },
+            "en": {
+                "title": "Japan Travel Achievements",
+                "subtitle": "Explore Japan • Unlock Badges • Complete Your Travel Notebook",
+                "earthTravelLink": "Earth Travel Achievements",
+                "shareCardBtn": "Share Card",
+                "themeToggleTextLight": "Light Theme",
+                "themeToggleTextDark": "Dark Theme",
+                "exportBtn": "Export Backup",
+                "importBtn": "Import Backup",
+                "resetBtn": "Reset",
+                "radarChartTitle": "📊 Category Progress (Radar)",
+                "badgeWallTitle": "🏆 Showcase Badge Wall",
+                "mapTitle": "Prefecture Travel Map",
+                "mapScrollHint": "💡 Scroll horizontally to view the full map",
+                "customAchTitle": "My Custom Achievements",
+                "addCustomAchBtn": "Add Custom Achievement",
+                "customAchEmptyHint": "No custom achievements yet. Record your meaningful travel moments here! (Max 10, counts toward total achievements and level)",
+                "searchPlaceholder": "Search achievements or descriptions...",
+                "filterAllDiff": "All Difficulties",
+                "filterDiff1": "★☆☆☆☆ (Beginner)",
+                "filterDiff2": "★★☆☆☆ (Traveler)",
+                "filterDiff3": "★★★☆☆ (Explorer)",
+                "filterDiff4": "★★★★☆ (Japan Fan)",
+                "filterDiff5": "★★★★★ (Shura)",
+                "filterDiff6": "★★★★★★ (Hidden)",
+                "filterAllRarity": "All Rarities",
+                "filterAllStatus": "All Status",
+                "filterStatusCompleted": "Unlocked",
+                "filterStatusUncompleted": "Locked",
+                "quickFilterLabel": "Quick Filter by Badge:",
+                "quickFilterAll": "All",
+                "avatarModalTitle": "Choose Avatar Emoji",
+                "closeBtn": "Close",
+                "shareModalTitle": "📸 Generate Travel Achievement Card",
+                "shareModalDesc": "You can share this card to social media (Threads, IG, etc.) to show off your Japan travel experiences!",
+                "shareToLabel": "Share to:",
+                "downloadPngBtn": "Download PNG",
+                "cancelBtn": "Cancel",
+                "customAchModalTitleAdd": "🌟 Add Custom Achievement",
+                "customAchModalTitleEdit": "✏️ Edit Custom Achievement",
+                "customAchNameLabel": "Name (Required, max 30 chars)",
+                "customAchDescLabel": "Description (Optional, max 60 chars)",
+                "customAchDiffLabel": "Difficulty Stars",
+                "customAchDiff1": "★☆☆☆☆ (Easy)",
+                "customAchDiff2": "★★☆☆☆ (Normal)",
+                "customAchDiff3": "★★★☆☆ (Hard)",
+                "customAchDiff4": "★★★★☆ (Very Hard)",
+                "customAchDiff5": "★★★★★ (Unforgettable)",
+                "saveBtn": "Save",
+                "registerTitle": "🎒 Explorer Registration",
+                "registerDesc": "Welcome to Japan Travel Achievements! Please register your explorer profile:",
+                "registerStep1": "1. Choose Starter Avatar",
+                "registerStep2": "2. Enter Your Nickname",
+                "registerPlaceholder": "e.g., Japan Traveler...",
+                "registerBtn": "🎮 Start Adventure!",
+                "footerCredit": "© 2026 Japan Travel Achievements. All rights reserved. Created with 💖 for Japan Travelers.",
+                "resetConfirm": "⚠️ Are you sure you want to reset all travel achievements and footprints? This action cannot be undone!",
+                "resetTitle": "Progress Reset",
+                "resetDesc": "Cleared all checked progress",
+                "importSuccessTitle": "Import Successful",
+                "importSuccessDesc": "Your travel progress has been fully restored",
+                "importErrorTitle": "Import Failed",
+                "importErrorDesc": "Invalid backup file format",
+                "playerNameInputTitle": "Click to edit nickname",
+                "xpDisplaySuffix": "Achievements",
+                "prefDisplayPrefix": "Visited",
+                "prefUnlockTitle": "Footprint Unlocked",
+                "prefUnlockDesc": "Visited: {name}",
+                "achUnlockTitle": "Achievement Unlocked!",
+                "customAchAddTitle": "Custom Achievement Created",
+                "customAchNameRequired": "Please enter achievement name!",
+                "customAchDeleteConfirm": "Are you sure you want to delete custom achievement \"{name}\"?",
+                "customAchLimitTitle": "Custom Achievement Limit",
+                "customAchLimitDesc": "You can only create up to {limit} custom achievements.",
+                "badgeUnlockTitle": "Badge Unlocked!",
+                "badgeUnlockDesc": "{emoji} [{name}] has been added to your badge wall",
+                "regSuccessTitle": "Adventure Started!",
+                "regSuccessDesc": "Explorer {name}, have a wonderful trip in Japan!",
+                "shareCardNotifyTitle": "Card Downloaded",
+                "shareCardNotifyDesc": "Welcome to share on Threads or Instagram!",
+                "igShareNotifyTitle": "Card Downloaded",
+                "igShareNotifyDesc": "Instagram does not support web sharing. Please open IG App to upload card.",
+                "defaultPlayerName": "Japan Traveler",
+                "editBtnTitle": "Edit",
+                "deleteBtnTitle": "Delete",
+                "customAchLabel": "Custom",
+                "customAchDefaultDesc": "A personal achievement created by you.",
+                "levelLabel": "LEVEL",
+                "shareCardTitle": "Japan Travel Achievement Card",
+                "totalUnlockRateLabel": "Total Unlock Rate",
+                "mapTitleLabel": "Footprint Map",
+                "radarChartTitleLabel": "📊 Category Progress",
+                "badgeWallTitleLabel": "🏆 Honor Badge Wall",
+                "showcaseTitleLabel": "🌟 Proudest Travel Achievements",
+                "catLabel": "Category: ",
+                "showcaseEmptyLabel": "No achievements unlocked for this slot yet. Go travel!",
+                
+                // Levels
+                "levelTitle0": "🌱 Japan Novice",
+                "levelTitle1": "🎒 Solo Backpacker",
+                "levelTitle2": "✈ Japan Explorer",
+                "levelTitle3": "🗾 Japan Expert",
+                "levelTitle4": "🎌 Japan Specialist",
+                "levelTitle5": "👑 Japanese Citizen (Self-proclaimed)",
+                "levelTitle6": "🏯 Japan Travel Deity",
+                
+                // Categories
+                "cat-交通": "Transit", "cat-美食": "Gourmet", "cat-文化": "Culture", "cat-自然": "Nature", "cat-住宿": "Lodging",
+                "cat-購物": "Shopping", "cat-攝影": "Photo", "cat-祭典": "Festivals", "cat-離島": "Islands", "cat-極限挑戰": "Challenges",
+                
+                // Regions
+                "reg-北海道": "Hokkaido", "reg-東北": "Tohoku", "reg-關東": "Kanto", "reg-中部": "Chubu", "reg-近畿": "Kansai",
+                "reg-中國": "Chugoku", "reg-四國": "Shikoku", "reg-九州": "Kyushu", "reg-沖繩": "Okinawa"
+            },
+            "ja": {
+                "title": "日本旅行アチーブメントシステム",
+                "subtitle": "日本の足跡を探索 • 冒険バッジを解放 • 旅行手帳を完成",
+                "earthTravelLink": "地球旅行アチーブメントシステム",
+                "shareCardBtn": "カードをシェア",
+                "themeToggleTextLight": "ライトテーマ",
+                "themeToggleTextDark": "ダークテーマ",
+                "exportBtn": "バックアップ出力",
+                "importBtn": "バックアップ入力",
+                "resetBtn": "リセット",
+                "radarChartTitle": "📊 分類別探索度 (レーダー)",
+                "badgeWallTitle": "🏆 バッジ展示ウォール",
+                "mapTitle": "都道府県足跡マップ",
+                "mapScrollHint": "💡 左右にスクロールしてマップ全体を表示",
+                "customAchTitle": "カスタムアチーブメント",
+                "addCustomAchBtn": "アチーブメント追加",
+                "customAchEmptyHint": "カスタムアチーブメントはまだありません。リストにはない、あなただけの特別な思い出を記録しましょう！（最大10個、総数とレベルに反映されます）",
+                "searchPlaceholder": "アチーブメント名や説明を検索...",
+                "filterAllDiff": "すべての難易度",
+                "filterDiff1": "★☆☆☆☆ (ビギナー)",
+                "filterDiff2": "★★☆☆☆ (トラベラー)",
+                "filterDiff3": "★★★☆☆ (エクスプローラー)",
+                "filterDiff4": "★★★★☆ (日本ファン)",
+                "filterDiff5": "★★★★★ (修羅)",
+                "filterDiff6": "★★★★★★ (隠し)",
+                "filterAllRarity": "すべてのレア度",
+                "filterAllStatus": "すべての状態",
+                "filterStatusCompleted": "アンプリセット済み",
+                "filterStatusUncompleted": "未アンプリセット",
+                "quickFilterLabel": "バッジでクイックフィルター：",
+                "quickFilterAll": "すべて",
+                "avatarModalTitle": "アバターを選択",
+                "closeBtn": "閉じる",
+                "shareModalTitle": "📸 アチーブメントカード生成",
+                "shareModalDesc": "このカードをSNS（Threads、IGなど）にシェアして、日本旅行の軌跡をみんなに自慢しましょう！",
+                "shareToLabel": "シェア：",
+                "downloadPngBtn": "画像をダウンロード",
+                "cancelBtn": "キャンセル",
+                "customAchModalTitleAdd": "🌟 アチーブメント追加",
+                "customAchModalTitleEdit": "✏️ アチーブメント編集",
+                "customAchNameLabel": "名称（必須、30文字以内）",
+                "customAchDescLabel": "説明（任意、60文字以内）",
+                "customAchDiffLabel": "難易度スター",
+                "customAchDiff1": "★☆☆☆☆ (手軽)",
+                "customAchDiff2": "★★☆☆☆ (普通)",
+                "customAchDiff3": "★★★☆☆ (努力)",
+                "customAchDiff4": "★★★★☆ (困難)",
+                "customAchDiff5": "★★★★★ (一生もの)",
+                "saveBtn": "保存",
+                "registerTitle": "🎒 冒険家登録",
+                "registerDesc": "アチーブメントシステムへようこそ！あなたのプロフィールを登録してください：",
+                "registerStep1": "1. アバターを選択してください",
+                "registerStep2": "2. ニックネームを入力してください",
+                "registerPlaceholder": "例：日本旅人小明...",
+                "registerBtn": "🎮 冒険を開始！",
+                "footerCredit": "© 2026 日本旅行アチーブメントシステム. All rights reserved. Created with 💖 for Japan Travelers.",
+                "resetConfirm": "⚠️ すべてのアチーブメントと都道府県の足跡をリセットしますか？この操作は取り消せません！",
+                "resetTitle": "進捗リセット",
+                "resetDesc": "すべてのチェックをクリアしました",
+                "importSuccessTitle": "インポート成功",
+                "importSuccessDesc": "旅行の進捗が完全に復元されました",
+                "importErrorTitle": "インポート失敗",
+                "importErrorDesc": "不正なバックアップファイル形式です",
+                "playerNameInputTitle": "クリックしてニックネーム編集",
+                "xpDisplaySuffix": "アチーブメント",
+                "prefDisplayPrefix": "訪問済み",
+                "prefUnlockTitle": "足跡をアンロック",
+                "prefUnlockDesc": "訪問済み: {name}",
+                "achUnlockTitle": "アチーブメント解除！",
+                "customAchAddTitle": "カスタムアチーブメント作成完了",
+                "customAchNameRequired": "アチーブメント名を入力してください！",
+                "customAchDeleteConfirm": "カスタムアチーブメント「{name}」を削除してもよろしいですか？",
+                "customAchLimitTitle": "カスタムアチーブメント上限",
+                "customAchLimitDesc": "カスタムアチーブメントは最大 {limit} 個まで作成可能です。",
+                "badgeUnlockTitle": "バッジ解除！",
+                "badgeUnlockDesc": "{emoji} [{name}] がバッジウォールに追加されました",
+                "regSuccessTitle": "冒険開始！",
+                "regSuccessDesc": "冒険家 {name}、日本での素晴らしい旅をお楽しみください！",
+                "shareCardNotifyTitle": "カード保存完了",
+                "shareCardNotifyDesc": "ThreadsやInstagramでシェアしましょう！",
+                "igShareNotifyTitle": "カード保存完了",
+                "igShareNotifyDesc": "Instagramはウェブ共有に対応していません。IGアプリを開いてカードをアップロードしてください。",
+                "defaultPlayerName": "日本旅人",
+                "editBtnTitle": "編集",
+                "deleteBtnTitle": "削除",
+                "customAchLabel": "カスタム",
+                "customAchDefaultDesc": "あなた自身が作成したカスタムアチーブメント。",
+                "levelLabel": "レベル",
+                "shareCardTitle": "日本旅行アチーブメント記録カード",
+                "totalUnlockRateLabel": "アチーブメント解除率",
+                "mapTitleLabel": "都道府県足跡",
+                "radarChartTitleLabel": "📊 分類別探索度",
+                "badgeWallTitleLabel": "🏆 解除バッジウォール",
+                "showcaseTitleLabel": "🌟 誇り高きアチーブメント",
+                "catLabel": "分類：",
+                "showcaseEmptyLabel": "アンロックされたアチーブメントはありません。旅に出ましょう！",
+                
+                // Levels
+                "levelTitle0": "🌱 日本ビギナー",
+                "levelTitle1": "🎒 バックパッカー",
+                "levelTitle2": "✈ 日本エクスプローラー",
+                "levelTitle3": "🗾 日本マスター",
+                "levelTitle4": "🎌 日本スペシャリスト",
+                "levelTitle5": "👑 日本国民（仮）",
+                "levelTitle6": "🏯 日本旅行の神",
+                
+                // Categories
+                "cat-交通": "交通", "cat-美食": "グルメ", "cat-文化": "文化", "cat-自然": "自然", "cat-住宿": "宿泊",
+                "cat-購物": "ショッピング", "cat-攝影": "撮影", "cat-祭典": "祭り", "cat-離島": "離島", "cat-極限挑戰": "極限に挑戦",
+                
+                // Regions
+                "reg-北海道": "北海道", "reg-東北": "東北", "reg-關東": "関東", "reg-中部": "中部", "reg-近畿": "近畿",
+                "reg-中國": "中国", "reg-四國": "四国", "reg-九州": "九州", "reg-沖繩": "沖縄"
+            }
+        };
+
+        function getTranslation(key, defaultValue = "") {
+            const lang = appState.language || 'zh-TW';
+            if (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) {
+                return TRANSLATIONS[lang][key];
+            }
+            return defaultValue;
+        }
+
+        function getCategoryTranslation(cat) {
+            return getTranslation("cat-" + cat, cat);
+        }
+
+        function getRegionTranslation(reg) {
+            return getTranslation("reg-" + reg, reg);
+        }
+
+        function updateStaticUITranslations() {
+            const lang = appState.language || 'zh-TW';
+            if (!TRANSLATIONS[lang]) return;
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (TRANSLATIONS[lang][key]) {
+                    if (el.tagName === 'INPUT') {
+                        el.placeholder = TRANSLATIONS[lang][key];
+                    } else if (el.tagName === 'OPTION') {
+                        el.textContent = TRANSLATIONS[lang][key];
+                    } else {
+                        el.textContent = TRANSLATIONS[lang][key];
+                    }
+                }
+            });
+
+            const searchBar = document.getElementById('searchBar');
+            if (searchBar) searchBar.placeholder = TRANSLATIONS[lang]["searchPlaceholder"] || "";
+
+            const playerName = document.getElementById('playerName');
+            if (playerName) playerName.title = TRANSLATIONS[lang]["playerNameInputTitle"] || "";
+
+            const registerNameInput = document.getElementById('registerNameInput');
+            if (registerNameInput) registerNameInput.placeholder = TRANSLATIONS[lang]["registerPlaceholder"] || "";
+
+            const editHint = document.querySelector('.name-wrapper span');
+            if (editHint) editHint.title = TRANSLATIONS[lang]["playerNameInputTitle"] || "點擊修改暱稱";
+            
+            updateThemeButtonUI();
+        }
+
+        function updateLanguageUI() {
+            updateStaticUITranslations();
+            
+            const totals = getAchievementTotals();
+            const completedCount = totals.completed;
+            const lvlDetails = getLevelDetails(completedCount);
+            const lang = appState.language || 'zh-TW';
+            
+            document.getElementById('playerLevelDisplay').textContent = `LEVEL ${lvlDetails.level}`;
+            document.getElementById('playerTitle').textContent = lvlDetails.title;
+            
+            const suffix = TRANSLATIONS[lang] ? TRANSLATIONS[lang]["xpDisplaySuffix"] : "成就";
+            document.getElementById('playerXpDisplay').textContent = `${completedCount} / ${totals.total} ${suffix}`;
+            
+            if (appState.playerName === "日本探險家" || appState.playerName === "Japan Traveler" || appState.playerName === "日本旅人") {
+                const defaultName = TRANSLATIONS[lang]["defaultPlayerName"] || "日本探險家";
+                appState.playerName = defaultName;
+                document.getElementById('playerName').value = defaultName;
+            }
+
+            const count = appState.visitedPrefectures.length;
+            const prefix = TRANSLATIONS[lang] ? TRANSLATIONS[lang]["prefDisplayPrefix"] : "已踩點";
+            document.getElementById('totalPrefCount').textContent = `${prefix} ${count} / 47`;
+        }
+
+        function changeLanguage(lang) {
+            appState.language = lang;
+            saveState();
+            buildAchievements();
+            updateUI();
+        }
+
         // --- 1. Emojis and Config Databases ---
         const avatars = ["🥋", "👘", "🍣", "🏯", "🦊", "🐱", "🐒", "🏔️", "🚄", "👺", "🐙", "🌸", "🍵", "🦌", "🍜", "🎒"];
 
@@ -1954,7 +2385,8 @@
             visitedPrefectures: [],
             customAchievements: [],
             theme: "dark",
-            registered: false
+            registered: false,
+            language: "zh-TW"
         };
 
         let activeFilters = {
@@ -2162,6 +2594,14 @@
 
             appState.customAchievements = sanitizeCustomAchievements(appState.customAchievements);
             
+            // Apply language
+            if (!appState.language) {
+                appState.language = "zh-TW";
+            }
+            const langSelect = document.getElementById('langSelect');
+            if (langSelect) langSelect.value = appState.language;
+            updateLanguageUI();
+
             // Apply theme
             document.documentElement.setAttribute('data-theme', appState.theme);
             updateThemeButtonUI();
@@ -2177,13 +2617,15 @@
         }
 
         function resetProgress() {
-            if (confirm("⚠️ 確定要重置所有旅遊成就與都道府縣足跡嗎？此動作無法復原！")) {
+            const lang = appState.language || 'zh-TW';
+            const confirmMsg = getTranslation("resetConfirm", "⚠️ 確定要重置所有旅遊成就與都道府縣足跡嗎？此動作無法復原！");
+            if (confirm(confirmMsg)) {
                 appState.checkedAchievements = [];
                 appState.visitedPrefectures = [];
                 appState.customAchievements.forEach(c => c.done = false);
                 saveState();
                 updateUI();
-                showNotification("進度重置", "已清除所有勾選記錄", "🔄");
+                showNotification(getTranslation("resetTitle", "進度重置"), getTranslation("resetDesc", "已清除所有勾選記錄"), "🔄");
             }
         }
 
@@ -2226,18 +2668,23 @@
                         if (typeof parsed.registered === 'boolean') {
                             appState.registered = parsed.registered;
                         }
+                        if (parsed.language === 'zh-TW' || parsed.language === 'en' || parsed.language === 'ja') {
+                            appState.language = parsed.language;
+                            const langSelect = document.getElementById('langSelect');
+                            if (langSelect) langSelect.value = appState.language;
+                        }
 
                         document.getElementById('playerName').value = appState.playerName;
                         document.getElementById('playerAvatar').textContent = appState.playerAvatar;
 
                         saveState();
                         updateUI();
-                        showNotification("導入成功", "你的旅遊進度已完全恢復", "📥");
+                        showNotification(getTranslation("importSuccessTitle", "導入成功"), getTranslation("importSuccessDesc", "你的旅遊進度已完全恢復"), "📥");
                     } else {
-                        alert("檔案格式不正確，請匯入本系統產出的 JSON 備份檔。");
+                        showNotification(getTranslation("importErrorTitle", "導入失敗"), getTranslation("importErrorDesc", "無效的備份檔案格式"), "⚠️");
                     }
                 } catch (err) {
-                    alert("讀取檔案出錯，請確認檔案格式是否正確。");
+                    showNotification(getTranslation("importErrorTitle", "導入失敗"), getTranslation("importErrorDesc", "無效的備份檔案格式"), "⚠️");
                 }
             };
             reader.readAsText(file);
@@ -2336,7 +2783,9 @@
 
             if (added) {
                 appState.visitedPrefectures.push(prefId);
-                showNotification("拜訪打卡", `已新增到訪足跡：${prefObj.name}`, "📍");
+                const title = getTranslation("prefUnlockTitle", "拜訪打卡");
+                const desc = getTranslation("prefUnlockDesc", "已新增到訪足跡：{name}").replace("{name}", prefObj.name);
+                showNotification(title, desc, "📍");
             } else {
                 appState.visitedPrefectures.splice(idx, 1);
             }
@@ -2385,7 +2834,7 @@
                 widget.className = `region-badge ${activeFilters.search === reg ? 'active' : ''}`;
                 widget.innerHTML = `
                     <div class="region-badge-header">
-                        <span>${reg}</span>
+                        <span>${getRegionTranslation(reg)}</span>
                         <span>${visited}/${total}</span>
                     </div>
                     <div class="region-badge-bar">
@@ -2402,7 +2851,8 @@
             // Update header numbers
             const visitedCount = appState.visitedPrefectures.length;
             const pctAll = Math.round((visitedCount / 47) * 100);
-            document.getElementById('totalPrefCount').textContent = `已踩點 ${visitedCount} / 47`;
+            const prefix = getTranslation("prefDisplayPrefix", "已踩點");
+            document.getElementById('totalPrefCount').textContent = `${prefix} ${visitedCount} / 47`;
             document.getElementById('totalPrefPercentage').textContent = `${pctAll}%`;
         }
 
@@ -2449,7 +2899,8 @@
                 const xLabel = cx + Math.cos(angleAt(i)) * opts.labelDist;
                 const yLabel = cy + Math.sin(angleAt(i)) * (opts.labelDist + (opts.labelYExtra || 0));
                 ctx.fillStyle = opts.labelColor;
-                const label = opts.withEmojis ? `${CATEGORY_EMOJIS[CATEGORIES[i]]}${CATEGORIES[i]}` : CATEGORIES[i];
+                const translatedCat = getCategoryTranslation(CATEGORIES[i]);
+                const label = opts.withEmojis ? `${CATEGORY_EMOJIS[CATEGORIES[i]]}${translatedCat}` : translatedCat;
                 ctx.fillText(label, xLabel, yLabel);
             }
 
@@ -2566,10 +3017,10 @@
             const btnIcon = document.getElementById('themeToggleIcon');
             
             if (appState.theme === 'light') {
-                btnText.textContent = "切換深色";
+                btnText.textContent = getTranslation("themeToggleTextDark", "切換深色");
                 btnIcon.textContent = "🌙";
             } else {
-                btnText.textContent = "切換淺色";
+                btnText.textContent = getTranslation("themeToggleTextLight", "切換淺色");
                 btnIcon.textContent = "☀️";
             }
         }
@@ -2641,9 +3092,10 @@
 
                 const header = document.createElement('div');
                 header.className = 'category-header';
+                const catName = getCategoryTranslation(cat);
                 header.innerHTML = `
                     <div class="category-info">
-                        <span class="category-title">${getCategoryEmoji(cat)} ${cat}</span>
+                        <span class="category-title">${getCategoryEmoji(cat)} ${catName}</span>
                         <span class="category-progress-pill">0 / ${inCat.length}</span>
                     </div>
                     <span class="category-toggle-icon">▼</span>
@@ -2845,9 +3297,9 @@
                         <div class="ach-meta">
                             <span class="ach-difficulty-stars">${stars}</span>
                             <span class="custom-ach-tools">
-                                <span class="rarity-pill rarity-custom">自訂</span>
-                                <button class="custom-ach-tool-btn" title="編輯" aria-label="編輯自訂成就">✏️</button>
-                                <button class="custom-ach-tool-btn" title="刪除" aria-label="刪除自訂成就">🗑️</button>
+                                <span class="rarity-pill rarity-custom">${getTranslation("customAchLabel", "自訂")}</span>
+                                <button class="custom-ach-tool-btn" title="${getTranslation("editBtnTitle", "編輯")}" aria-label="編輯自訂成就">✏️</button>
+                                <button class="custom-ach-tool-btn" title="${getTranslation("deleteBtnTitle", "刪除")}" aria-label="刪除自訂成就">🗑️</button>
                             </span>
                         </div>
                         <div class="ach-name"></div>
@@ -2856,7 +3308,7 @@
                 `;
                 // User-entered text goes in via textContent, never innerHTML
                 card.querySelector('.ach-name').textContent = c.name;
-                card.querySelector('.ach-desc').textContent = c.desc || '由你親自訂立的專屬成就。';
+                card.querySelector('.ach-desc').textContent = c.desc || getTranslation("customAchDefaultDesc", '由你親自訂立的專屬成就。');
 
                 const checkbox = card.querySelector('.ach-checkbox');
                 checkbox.checked = c.done;
@@ -2882,21 +3334,29 @@
             if (!c) return;
             c.done = !c.done;
             if (c.done) {
-                showNotification("成就解除！", c.name, "🌟");
+                const lang = appState.language || 'zh-TW';
+                const title = TRANSLATIONS[lang] ? TRANSLATIONS[lang]["achUnlockTitle"] : "成就解除！";
+                showNotification(title, c.name, "🌟");
             }
             saveState();
             updateUI();
         }
 
         function openCustomAchModal(editId = null) {
+            const lang = appState.language || 'zh-TW';
             if (editId === null && appState.customAchievements.length >= CUSTOM_ACH_LIMIT) {
-                showNotification("已達上限", `自訂成就最多 ${CUSTOM_ACH_LIMIT} 個`, "⚠️");
+                const title = getTranslation("customAchLimitTitle", "自訂成就上限");
+                const desc = getTranslation("customAchLimitDesc", "最多只能建立 {limit} 個自訂成就").replace("{limit}", CUSTOM_ACH_LIMIT);
+                showNotification(title, desc, "⚠️");
                 return;
             }
             editingCustomAchId = editId;
             const editing = editId !== null ? appState.customAchievements.find(c => c.id === editId) : null;
 
-            document.getElementById('customAchModalTitle').textContent = editing ? '✏️ 編輯自訂成就' : '🌟 新增自訂成就';
+            const titleText = editing 
+                ? getTranslation("customAchModalTitleEdit", '✏️ 編輯自訂成就')
+                : getTranslation("customAchModalTitleAdd", '🌟 新增自訂成就');
+            document.getElementById('customAchModalTitle').textContent = titleText;
             document.getElementById('customAchName').value = editing ? editing.name : '';
             document.getElementById('customAchDesc').value = editing ? editing.desc : '';
             document.getElementById('customAchDiff').value = editing ? String(editing.diff) : '3';
@@ -2912,7 +3372,7 @@
         function saveCustomAchievement() {
             const name = document.getElementById('customAchName').value.trim().slice(0, 30);
             if (!name) {
-                alert('請輸入成就名稱！');
+                alert(getTranslation("customAchNameRequired", '請輸入成就名稱！'));
                 return;
             }
             const desc = document.getElementById('customAchDesc').value.trim().slice(0, 60);
@@ -2938,7 +3398,8 @@
         function deleteCustomAchievement(id) {
             const c = appState.customAchievements.find(x => x.id === id);
             if (!c) return;
-            if (!confirm(`確定要刪除自訂成就「${c.name}」嗎？`)) return;
+            const confirmMsg = getTranslation("customAchDeleteConfirm", "確定要刪除自訂成就「{name}」嗎？").replace("{name}", c.name);
+            if (!confirm(confirmMsg)) return;
             appState.customAchievements = appState.customAchievements.filter(x => x.id !== id);
             saveState();
             updateUI();
@@ -2951,7 +3412,9 @@
 
             if (idx === -1) {
                 appState.checkedAchievements.push(id);
-                showNotification("成就解除！", ach.name, "🏆");
+                const lang = appState.language || 'zh-TW';
+                const title = TRANSLATIONS[lang] ? TRANSLATIONS[lang]["achUnlockTitle"] : "成就解除！";
+                showNotification(title, ach.name, "🏆");
             } else {
                 appState.checkedAchievements.splice(idx, 1);
             }
@@ -2964,7 +3427,9 @@
             if (!appState.checkedAchievements.includes(id)) {
                 appState.checkedAchievements.push(id);
                 const ach = achievementsData.find(a => a.id === id);
-                showNotification("成就解除！", ach.name, "🏆");
+                const lang = appState.language || 'zh-TW';
+                const title = TRANSLATIONS[lang] ? TRANSLATIONS[lang]["achUnlockTitle"] : "成就解除！";
+                showNotification(title, ach.name, "🏆");
             }
         }
 
@@ -2981,7 +3446,11 @@
                         if (!badgeEl.classList.contains('unlocked')) {
                             badgeEl.classList.add('unlocked');
                             if (!silent) {
-                                showNotification("解鎖榮譽徽章！", `${badge.emoji} [${badge.name}] 已加入收藏牆`, "🏆");
+                                const lang = appState.language || 'zh-TW';
+                                const title = TRANSLATIONS[lang] ? TRANSLATIONS[lang]["badgeUnlockTitle"] : "解鎖榮譽徽章！";
+                                const descPattern = TRANSLATIONS[lang] ? TRANSLATIONS[lang]["badgeUnlockDesc"] : "{emoji} [{name}] 已加入收藏牆";
+                                const desc = descPattern.replace("{emoji}", badge.emoji).replace("{name}", badge.name);
+                                showNotification(title, desc, "🏆");
                             }
                         }
                         activeCount++;
@@ -3013,15 +3482,10 @@
 
         // --- 17. Master UI Layout Synchronizer ---
         function updateUI() {
+            updateLanguageUI();
+            
             const totals = getAchievementTotals();
             const completedCount = totals.completed;
-            const lvlDetails = getLevelDetails(completedCount);
-            
-            document.getElementById('playerLevelDisplay').textContent = `LEVEL ${lvlDetails.level}`;
-            document.getElementById('playerTitle').textContent = lvlDetails.title;
-            
-            const xpText = `${completedCount} / ${totals.total} 成就`;
-            document.getElementById('playerXpDisplay').textContent = xpText;
             
             const pctXP = Math.round((completedCount / totals.total) * 100);
             document.getElementById('playerLevelProgress').style.width = `${pctXP}%`;
@@ -3103,7 +3567,7 @@
             ctx.font = 'bold 36px sans-serif';
             ctx.fillStyle = isDark ? '#ffffff' : '#2c2a29';
             ctx.textAlign = 'center';
-            ctx.fillText('日本旅行成就記錄卡', 400, 80);
+            ctx.fillText(getTranslation("shareCardTitle", "日本旅行成就記錄卡"), 400, 80);
             
             ctx.font = '800 14px sans-serif';
             ctx.fillStyle = isDark ? '#00d2ff' : '#d71318';
@@ -3128,7 +3592,8 @@
             const lvlDetails = getLevelDetails(cardTotals.completed);
             ctx.font = 'bold 16px sans-serif';
             ctx.fillStyle = isDark ? '#ffd700' : '#d71318';
-            ctx.fillText(`等級 ${lvlDetails.level} • ${lvlDetails.title}`, 230, 235);
+            const levelLabel = getTranslation("levelLabel", "等級");
+            ctx.fillText(`${levelLabel} ${lvlDetails.level} • ${lvlDetails.title}`, 230, 235);
 
             ctx.fillStyle = isDark ? '#1b2838' : '#ffffff';
             ctx.strokeStyle = isDark ? '#2a475e' : '#e6dcd0';
@@ -3141,8 +3606,8 @@
             ctx.textAlign = 'center';
             ctx.font = 'bold 13px sans-serif';
             ctx.fillStyle = isDark ? '#c7d5e0' : '#5a5754';
-            ctx.fillText('總成就解鎖率', 535, 195);
-            ctx.fillText('都道府縣足跡', 675, 195);
+            ctx.fillText(getTranslation("totalUnlockRateLabel", "總成就解鎖率"), 535, 195);
+            ctx.fillText(getTranslation("mapTitleLabel", "都道府縣足跡"), 675, 195);
 
             ctx.font = 'bold 24px sans-serif';
             ctx.fillStyle = isDark ? '#00d2ff' : '#d71318';
@@ -3159,7 +3624,7 @@
             ctx.textAlign = 'left';
             ctx.font = 'bold 20px sans-serif';
             ctx.fillStyle = isDark ? '#c7d5e0' : '#2c2a29';
-            ctx.fillText('📊 分類探索度', 60, 330);
+            ctx.fillText(getTranslation("radarChartTitleLabel", "📊 分類探索度"), 60, 330);
 
             drawRadar(ctx, 220, 510, 100, {
                 gridColor: isDark ? 'rgba(42, 71, 94, 0.4)' : 'rgba(230, 220, 208, 0.8)',
@@ -3173,7 +3638,7 @@
             ctx.textAlign = 'left';
             ctx.font = 'bold 20px sans-serif';
             ctx.fillStyle = isDark ? '#c7d5e0' : '#2c2a29';
-            ctx.fillText('🏆 解鎖榮譽徽章牆', 430, 330);
+            ctx.fillText(getTranslation("badgeWallTitleLabel", "🏆 解鎖榮譽徽章牆"), 430, 330);
 
             let bx = 430, by = 360;
             let count = 0;
@@ -3217,7 +3682,7 @@
             ctx.textAlign = 'left';
             ctx.font = 'bold 20px sans-serif';
             ctx.fillStyle = isDark ? '#c7d5e0' : '#2c2a29';
-            ctx.fillText('🌟 最引以為傲的冒險成就', 60, 720);
+            ctx.fillText(getTranslation("showcaseTitleLabel", "🌟 最引以為傲的冒險成就"), 60, 720);
 
             const unlockedAchs = achievementsData.filter(a => appState.checkedAchievements.includes(a.id))
                 .concat(appState.customAchievements.filter(c => c.done).map(c => ({ ...c, rarity: 'Custom', cat: '自訂' })));
@@ -3246,17 +3711,23 @@
 
                     ctx.font = 'bold 10px sans-serif';
                     ctx.fillStyle = isDark ? '#00ff87' : '#2e5c1e';
-                    ctx.fillText(`[${ach.rarity.toUpperCase()}]`, 220, achY + 74);
+                    const customLabel = getTranslation("customAchLabel", "自訂");
+                    const rarityLabel = ach.rarity === 'Custom' ? customLabel : ach.rarity;
+                    ctx.fillText(`[${rarityLabel.toUpperCase()}]`, 220, achY + 74);
 
                     ctx.font = '13px sans-serif';
                     ctx.fillStyle = isDark ? '#c7d5e0' : '#5a5754';
-                    ctx.fillText(truncateToWidth(ctx, ach.desc, 400), 320, achY + 40);
-                    ctx.fillText(`分類：${ach.cat}`, 320, achY + 70);
+                    const customDesc = getTranslation("customAchDefaultDesc", '由你親自訂立的專屬成就。');
+                    const achDesc = ach.desc || customDesc;
+                    ctx.fillText(truncateToWidth(ctx, achDesc, 400), 320, achY + 40);
+                    const catLabel = getTranslation("catLabel", "分類：");
+                    const catName = getCategoryTranslation(ach.cat);
+                    ctx.fillText(`${catLabel}${catName}`, 320, achY + 70);
                 } else {
                     ctx.font = 'italic 16px sans-serif';
                     ctx.fillStyle = isDark ? '#8fa0b0' : '#8b8882';
                     ctx.textAlign = 'center';
-                    ctx.fillText('尚無解鎖此欄位之高級成就，趕快去旅行吧！', 400, achY + 55);
+                    ctx.fillText(getTranslation("showcaseEmptyLabel", '尚無解鎖此欄位之高級成就，趕快去旅行吧！'), 400, achY + 55);
                     ctx.textAlign = 'left';
                 }
                 achY += 120;
@@ -3271,7 +3742,7 @@
             ctx.font = 'bold 13px sans-serif';
             ctx.fillStyle = isDark ? '#8fa0b0' : '#8b8882';
             ctx.textAlign = 'left';
-            ctx.fillText('本成就卡由「日本旅行成就系統」產出', 60, 1150);
+            ctx.fillText(getTranslation("shareCardFooter", "本成就卡由「日本旅行成就系統」產出"), 60, 1150);
             
             ctx.textAlign = 'right';
             ctx.fillText('yblog.org • ivanusto', 740, 1150);
@@ -3294,7 +3765,10 @@
         function downloadShareCard() {
             triggerCardDownload();
             closeShareModal();
-            showNotification("圖卡下載成功", "歡迎分享到 Threads 或 Instagram！", "📸");
+            const lang = appState.language || 'zh-TW';
+            const title = getTranslation("shareCardNotifyTitle", "圖卡下載成功");
+            const desc = getTranslation("shareCardNotifyDesc", "歡迎分享到 Threads 或 Instagram！");
+            showNotification(title, desc, "📸");
         }
 
         // --- 18.5 Social Share Intents ---
@@ -3303,6 +3777,12 @@
         function buildShareText() {
             const totals = getAchievementTotals();
             const prefCount = appState.visitedPrefectures.length;
+            const lang = appState.language || 'zh-TW';
+            if (lang === 'en') {
+                return `I unlocked ${totals.completed}/${totals.total} achievements and visited ${prefCount}/47 prefectures in the "Japan Travel Achievements" system! Come and check your travel footprint 🇯🇵`;
+            } else if (lang === 'ja') {
+                return `「日本旅行アチーブメントシステム」で ${totals.completed}/${totals.total} 個のアチーブメントを解除し、${prefCount}/47 都道府県を訪問しました！あなたの日本旅行の軌跡を挑戦してみましょう 🇯🇵`;
+            }
             return `我在「日本旅行成就系統」解鎖了 ${totals.completed}/${totals.total} 項成就、踩點 ${prefCount}/47 個都道府縣！快來挑戰你的日本旅行足跡 🇯🇵`;
         }
 
@@ -3350,7 +3830,10 @@
                     }
                 }
                 triggerCardDownload();
-                showNotification("圖卡已下載", "Instagram 不支援網頁分享，請開啟 IG App 上傳圖卡", "📸");
+                const lang = appState.language || 'zh-TW';
+                const title = getTranslation("igShareNotifyTitle", "圖卡已下載");
+                const desc = getTranslation("igShareNotifyDesc", "Instagram 不支援網頁分享，請開啟 IG App 上傳圖卡");
+                showNotification(title, desc, "📸");
             }, 'image/png');
         }
 
@@ -3406,7 +3889,10 @@
             
             // Play sweet unlock chime and confetti for starting
             setTimeout(() => {
-                showNotification("冒險開始！", `探險家 ${name}，祝您日本旅行愉快！`, "🎒");
+                const lang = appState.language || 'zh-TW';
+                const title = getTranslation("regSuccessTitle", "冒險開始！");
+                const desc = getTranslation("regSuccessDesc", "探險家 {name}，祝您日本旅行愉快！").replace("{name}", name);
+                showNotification(title, desc, "🎒");
             }, 500);
         }
 
