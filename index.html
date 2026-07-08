@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日本旅行成就系統 Ultimate Edition</title>
+    <title>日本旅行成就系統</title>
     <meta name="description" content="202 項日本旅遊成就打卡、47 都道府縣足跡地圖、榮譽徽章牆與探索雷達圖，一鍵生成可分享的旅行成就卡。進度自動保存在瀏覽器，免安裝免註冊。">
     <meta name="theme-color" content="#12181f">
     <link rel="canonical" href="https://ivanusto.github.io/japan-travel-achievement-list/">
@@ -11,8 +11,8 @@
 
     <!-- Open Graph / Twitter social sharing cards -->
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="日本旅行成就系統 Ultimate Edition">
-    <meta property="og:title" content="日本旅行成就系統 Ultimate Edition">
+    <meta property="og:site_name" content="日本旅行成就系統">
+    <meta property="og:title" content="日本旅行成就系統">
     <meta property="og:description" content="202 項日本旅遊成就、47 都道府縣足跡地圖、徽章牆與雷達圖，一鍵生成你的日本旅行成就卡！">
     <meta property="og:url" content="https://ivanusto.github.io/japan-travel-achievement-list/">
     <meta property="og:image" content="https://ivanusto.github.io/japan-travel-achievement-list/og-image.png">
@@ -20,7 +20,7 @@
     <meta property="og:image:height" content="630">
     <meta property="og:locale" content="zh_TW">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="日本旅行成就系統 Ultimate Edition">
+    <meta name="twitter:title" content="日本旅行成就系統">
     <meta name="twitter:description" content="202 項日本旅遊成就、47 都道府縣足跡地圖、徽章牆與雷達圖，一鍵生成你的日本旅行成就卡！">
     <meta name="twitter:image" content="https://ivanusto.github.io/japan-travel-achievement-list/og-image.png">
 
@@ -1404,10 +1404,13 @@
     <div class="app-wrapper">
         <header>
             <div class="header-title-section">
-                <h1>🇯🇵 日本旅行成就系統 <span style="font-size:16px; background:var(--accent-red); color:#fff; padding:2px 8px; border-radius:4px; font-weight:800;">ULTIMATE</span></h1>
+                <h1>🇯🇵 日本旅行成就系統</h1>
                 <p>探索東瀛足跡 • 解鎖冒險徽章 • 完成你的日本旅行手帳</p>
             </div>
             <div class="header-controls">
+                <a class="btn" href="https://ivanusto.github.io/travel-achievement-list/" target="_blank" rel="noreferrer noopener" style="text-decoration:none;">
+                    <span>🌍</span> 地球旅行成就系統
+                </a>
                 <button class="btn btn-accent" onclick="generateShareCard()">
                     <span>📸</span> 一鍵分享成就卡
                 </button>
@@ -1579,9 +1582,10 @@
                 <a href="https://www.plurk.com/ivanusto" target="_blank" rel="noreferrer noopener">ivanusto @ plurk</a>
                 <a href="https://www.instagram.com/ivanusto/" target="_blank" rel="noreferrer noopener">ivanusto @ instagram</a>
                 <a href="https://www.facebook.com/ivanusto" target="_blank" rel="noreferrer noopener">ivanusto @ facebook</a>
+                <a href="https://ivanusto.github.io/travel-achievement-list/" target="_blank" rel="noreferrer noopener">🌍 地球旅行成就系統</a>
             </div>
             <div class="footer-credit">
-                © 2026 日本旅行成就系統 Ultimate Edition. All rights reserved. Created with 💖 for Japan Travelers.
+                © 2026 日本旅行成就系統. All rights reserved. Created with 💖 for Japan Travelers.
             </div>
         </footer>
     </div>
@@ -3103,7 +3107,7 @@
             
             ctx.font = '800 14px sans-serif';
             ctx.fillStyle = isDark ? '#00d2ff' : '#d71318';
-            ctx.fillText('JAPAN TRAVEL ACHIEVEMENT CARD • ULTIMATE EDITION', 400, 115);
+            ctx.fillText('JAPAN TRAVEL ACHIEVEMENT CARD', 400, 115);
 
             ctx.beginPath();
             ctx.moveTo(60, 140);
@@ -3267,7 +3271,7 @@
             ctx.font = 'bold 13px sans-serif';
             ctx.fillStyle = isDark ? '#8fa0b0' : '#8b8882';
             ctx.textAlign = 'left';
-            ctx.fillText('本成就卡由「日本旅行成就系統 Ultimate Edition」產出', 60, 1150);
+            ctx.fillText('本成就卡由「日本旅行成就系統」產出', 60, 1150);
             
             ctx.textAlign = 'right';
             ctx.fillText('yblog.org • ivanusto', 740, 1150);
