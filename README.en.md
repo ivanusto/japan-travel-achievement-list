@@ -1,5 +1,7 @@
 # 🇯🇵 Japan Travel Achievements
 
+🌐 **Languages / 多語言版本**: [繁體中文](README.md) | [English](README.en.md) | [日本語](README.ja.md)
+
 A personal Japan travel footprint check-in and share card generator platform that combines an **achievement system**, **tile aesthetics**, and **traditional Japanese notebook style**.
 
 This system is fully deployed in the cloud. Players do not need to install any program or download files, and can directly complete all check-in records, Japan travel achievements, etc., including hidden achievements, in the browser.
