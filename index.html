@@ -1269,95 +1269,86 @@
         }
 
         /* Share Canvas Modal */
-        #shareModalBackdrop {
+        .share-modal-backdrop {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(8px);
-            z-index: 11000;
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            z-index: 2000;
         }
 
         .share-modal-content {
             background: var(--bg-card);
             border: 2px solid var(--border-color);
             border-radius: 20px;
-            max-width: 500px;
             width: 100%;
+            max-width: 440px;
             padding: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            text-align: center;
+            box-shadow: var(--shadow-primary);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        #sharingPreviewCanvas {
-            max-width: 100%;
-            max-height: 55vh;
+        .sharing-preview-canvas-wrapper {
+            width: 100%;
             border-radius: 12px;
+            overflow: hidden;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin: 16px 0;
+            background: #000;
         }
 
-        .share-actions {
-            display: flex;
-            gap: 12px;
+        .sharing-preview-canvas-wrapper canvas {
             width: 100%;
+            display: block;
         }
 
-        .share-actions button {
-            flex-grow: 1;
-        }
-
-        /* Social share intent buttons inside the share modal */
-        .share-social-row {
+        .social-share-row {
             display: flex;
-            align-items: center;
-            justify-content: center;
             gap: 10px;
-            width: 100%;
+            justify-content: center;
             flex-wrap: wrap;
+            margin-bottom: 16px;
+            width: 100%;
         }
 
-        .share-social-label {
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--text-secondary);
-        }
-
-        .social-share-btn {
-            width: 42px;
-            height: 42px;
-            padding: 0;
-            border-radius: 50%;
-            border: 1px solid var(--border-color);
-            background: var(--bg-primary);
-            color: var(--text-primary);
+        .social-btn {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .social-share-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
+        .social-btn:hover {
+            border-color: var(--border-color-active) !important;
+            background: var(--bg-card-hover) !important;
+            transform: translateY(-2px);
         }
 
-        .social-share-btn:hover {
-            transform: translateY(-2px);
-            border-color: var(--border-color-active);
-            color: var(--border-color-active);
-            box-shadow: 0 4px 10px var(--shadow-glow);
+        .share-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+            width: 100%;
         }
 
         /* Custom (user-defined) achievements */
@@ -1659,36 +1650,41 @@
         </div>
     </div>
 
-    <!-- Share PNG Card Modal -->
-    <div id="shareModalBackdrop" onclick="closeShareModal()">
+    <!-- Share Card Generation Modal -->
+    <div class="share-modal-backdrop" id="shareModalBackdrop" onclick="if(event.target === this) closeShareModal()">
         <div class="share-modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-top:0; margin-bottom:10px;">📸 生成個人旅行成就卡</h3>
-            <p style="margin:0 0 10px 0; font-size:13px; color:var(--text-secondary); text-align:center;">
-                你可以將此圖卡分享到社交媒體（如 Threads, IG 等），向大家炫耀你的日本旅遊歷練！
-            </p>
-            <canvas id="sharingPreviewCanvas" width="800" height="1200"></canvas>
-            <div class="share-social-row">
-                <span class="share-social-label">分享到：</span>
-                <button class="social-share-btn" onclick="shareToSocial('instagram')" title="分享到 Instagram" aria-label="分享到 Instagram">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            <h3 data-i18n="shareModalTitle">📸 生成個人成就卡</h3>
+            <p style="font-size: 13px; color: var(--text-secondary); margin: 0 0 16px 0;" data-i18n="shareModalDesc">你可以將此圖卡分享到社交媒體，炫耀你的日本旅遊歷練！</p>
+            
+            <div class="sharing-preview-canvas-wrapper" style="margin-bottom: 16px;">
+                <canvas id="sharingPreviewCanvas" width="800" height="1200"></canvas>
+            </div>
+
+            <div class="social-share-row" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; width: 100%;">
+                <button class="social-btn threads" onclick="shareToSocial('threads')" title="Share to Threads">
+                    <span>🧵</span> Threads
                 </button>
-                <button class="social-share-btn" onclick="shareToSocial('x')" title="分享到 X (Twitter)" aria-label="分享到 X (Twitter)">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+                <button class="social-btn facebook" onclick="shareToSocial('facebook')" title="Share to Facebook">
+                    <span>👤</span> Facebook
                 </button>
-                <button class="social-share-btn" onclick="shareToSocial('threads')" title="分享到 Threads" aria-label="分享到 Threads">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/></svg>
-                </button>
-                <button class="social-share-btn" onclick="shareToSocial('line')" title="分享到 LINE" aria-label="分享到 LINE">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-                </button>
-                <button class="social-share-btn" onclick="shareToSocial('facebook')" title="分享到 Facebook" aria-label="分享到 Facebook">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                <button class="social-btn x-twitter" onclick="shareToSocial('x')" title="Share to X">
+                    <span>🐦</span> X / Twitter
                 </button>
             </div>
-            <div class="share-actions">
-                <button class="btn btn-accent" onclick="downloadShareCard()">下載 PNG 圖片</button>
-                <button class="btn" onclick="closeShareModal()">取消</button>
+
+            <div class="share-actions-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 12px; width: 100%;">
+                <button class="btn btn-accent" onclick="downloadShareCard()" style="justify-content: center; gap: 6px; font-weight: 700; width: 100%;">
+                    <span>💾</span> <span data-i18n="downloadPngBtn">下載 PNG 圖片</span>
+                </button>
+                <button class="btn" onclick="copyShareCardImage()" id="copyImageBtn" style="justify-content: center; gap: 6px; font-weight: 700; width: 100%;">
+                    <span>📸</span> <span data-i18n="copyImageBtnText">複製圖片</span>
+                </button>
+                <button class="btn" onclick="copyTextReport()" style="justify-content: center; gap: 6px; font-weight: 700; width: 100%;">
+                    <span>📝</span> <span data-i18n="copyTextReportBtnText">複製文字報告</span>
+                </button>
             </div>
+
+            <button class="btn" onclick="closeShareModal()" data-i18n="cancelBtn" style="width: 100%; justify-content: center; font-weight: 700;">取消</button>
         </div>
     </div>
 
@@ -1829,7 +1825,12 @@
                         "projectTaiwanLink": "台灣旅行成就系統",
                         "projectJapanLink": "日本旅行成就系統",
                         "projectWorldLink": "觀光旅行成就系統",
-                        "footerCreditUnified": "© 2026 Life Achievement Lists • Created by ivanusto. All rights reserved.<br>進度會自動儲存在您瀏覽器的本地快取（LocalStorage）中，無後端伺服器，確保您的隱私。"
+                        "footerCreditUnified": "© 2026 Life Achievement Lists • Created by ivanusto. All rights reserved.<br>進度會自動儲存在您瀏覽器的本地快取（LocalStorage）中，無後端伺服器，確保您的隱私。",
+                        "copyImageBtnText": "複製圖片",
+                        "copyTextReportBtnText": "複製文字報告",
+                        "copyImageSuccess": "圖片複製成功，快去貼上分享吧！",
+                        "copyTextSuccess": "文字報告已複製到剪貼簿！",
+                        "copyFailed": "複製失敗，瀏覽器可能不支援"
             },
             "en": {
                         "title": "Japan Travel Achievements",
@@ -2489,7 +2490,12 @@
                         "projectTaiwanLink": "Taiwan Travel Achievements",
                         "projectJapanLink": "Japan Travel Achievements",
                         "projectWorldLink": "Global Travel Achievements",
-                        "footerCreditUnified": "© 2026 Life Achievement Lists • Created by ivanusto. All rights reserved.<br>Progress is saved locally on your browser (LocalStorage) with complete privacy."
+                        "footerCreditUnified": "© 2026 Life Achievement Lists • Created by ivanusto. All rights reserved.<br>Progress is saved locally on your browser (LocalStorage) with complete privacy.",
+                        "copyImageBtnText": "Copy Image",
+                        "copyTextReportBtnText": "Copy Text Report",
+                        "copyImageSuccess": "Card image copied to clipboard!",
+                        "copyTextSuccess": "Text report copied to clipboard!",
+                        "copyFailed": "Copy failed. Browser may not support clipboard writing."
             },
             "ja": {
                         "title": "日本旅行アチーブメントシステム",
@@ -3101,7 +3107,12 @@
                         "projectTaiwanLink": "台湾旅行の実績システム",
                         "projectJapanLink": "日本旅行の実績システム",
                         "projectWorldLink": "観光旅行の実績システム",
-                        "footerCreditUnified": "© 2026 Life Achievement Lists • Created by ivanusto. All rights reserved.<br>進行状況はブラウザのローカルストレージ（LocalStorage）に自動的に保存され、プライバシーは保護されます。"
+                        "footerCreditUnified": "© 2026 Life Achievement Lists • Created by ivanusto. All rights reserved.<br>進行状況はブラウザのローカルストレージ（LocalStorage）に自動的に保存され、プライバシーは保護されます。",
+                        "copyImageBtnText": "画像をコピー",
+                        "copyTextReportBtnText": "テキストレポートをコピー",
+                        "copyImageSuccess": "画像をクリップボードにコピーしました！",
+                        "copyTextSuccess": "テキストレポートをクリップボードにコピーしました！",
+                        "copyFailed": "コピーに失敗しました。ブラウザが対応していない可能性があります。"
             }
 };
 
@@ -4922,6 +4933,114 @@
             const title = getTranslation("shareCardNotifyTitle", "圖卡下載成功");
             const desc = getTranslation("shareCardNotifyDesc", "歡迎分享到 Threads 或 Instagram！");
             showNotification(title, desc, "📸");
+        }
+
+        function copyShareCardImage() {
+            const canvas = document.getElementById('sharingPreviewCanvas');
+            if (!canvas) return;
+            
+            try {
+                canvas.toBlob(blob => {
+                    if (!blob) {
+                        showNotification(getTranslation("copyFailed"), "", "⚠️");
+                        return;
+                    }
+                    navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]).then(() => {
+                        closeShareModal();
+                        showNotification(getTranslation("copyImageSuccess"), "", "📸");
+                    }).catch(err => {
+                        console.error("Clipboard image copy failed:", err);
+                        showNotification(getTranslation("copyFailed"), "", "⚠️");
+                    });
+                }, 'image/png');
+            } catch (e) {
+                console.error("ClipboardItem error:", e);
+                showNotification(getTranslation("copyFailed"), "", "⚠️");
+            }
+        }
+
+        function copyTextReport() {
+            const totals = getAchievementTotals();
+            const levelDetails = getLevelDetails(totals.completed);
+            const lang = appState.language || 'zh-TW';
+            
+            let unlockedBadges = [];
+            badgeData.forEach(badge => {
+                const stat = getBadgeProgress(badge.id);
+                if (stat.unlocked) {
+                    const name = getBadgeName(badge);
+                    unlockedBadges.push(`${badge.emoji} ${name}`);
+                }
+            });
+            
+            const unlockedAchs = achievementsData.filter(a => appState.checkedAchievements.includes(a.id))
+                .concat(appState.customAchievements.filter(c => c.done).map(c => ({ ...c, rarity: 'Custom', cat: '自訂' })));
+            unlockedAchs.sort((a, b) => b.diff - a.diff || b.id - a.id);
+            const top3 = unlockedAchs.slice(0, 3);
+            
+            let report = "";
+            if (lang === 'en') {
+                report += `🌟 ${appState.playerName}'s Japan Travel Achievements Report 🌟\n`;
+                report += `🏆 Title: ${levelDetails.title} (LV ${levelDetails.level})\n`;
+                report += `📊 Milestones Unlocked: ${totals.completed} / ${totals.total} (${Math.round(totals.completed / totals.total * 100)}%)\n`;
+                report += `🧭 Footprints: ${appState.visitedPrefectures.length} / 47 Prefectures (${Math.round(appState.visitedPrefectures.length / 47 * 100)}%)\n`;
+                if (unlockedBadges.length > 0) {
+                    report += `🎖️ Badges Showcase: ${unlockedBadges.join(', ')}\n`;
+                }
+                if (top3.length > 0) {
+                    report += `✨ Proudest Milestones:\n`;
+                    top3.forEach((ach, index) => {
+                        const name = getTranslation("ach-name-" + ach.id, ach.name);
+                        const desc = getTranslation("ach-desc-" + ach.id, ach.desc);
+                        report += `  ${index + 1}. [${name}] - ${desc}\n`;
+                    });
+                }
+                report += `\n📍 Record your Japan travel achievements here: ${SHARE_URL}\n`;
+            } else if (lang === 'ja') {
+                report += `🌟 【${appState.playerName}】の日本旅行実績レポート 🌟\n`;
+                report += `🏆 現在の称号：${levelDetails.title} (LV ${levelDetails.level})\n`;
+                report += `📊 実績解除数：${totals.completed} / ${totals.total} (${Math.round(totals.completed / totals.total * 100)}%)\n`;
+                report += `🧭 足跡マップ：${appState.visitedPrefectures.length} / 47 都道府県 (${Math.round(appState.visitedPrefectures.length / 47 * 100)}%)\n`;
+                if (unlockedBadges.length > 0) {
+                    report += `🎖️ 獲得バッジ：${unlockedBadges.join(', ')}\n`;
+                }
+                if (top3.length > 0) {
+                    report += `✨ 誇りに思う実績：\n`;
+                    top3.forEach((ach, index) => {
+                        const name = getTranslation("ach-name-" + ach.id, ach.name);
+                        const desc = getTranslation("ach-desc-" + ach.id, ach.desc);
+                        report += `  ${index + 1}. 【${name}】 - ${desc}\n`;
+                    });
+                }
+                report += `\n📍 ここであなたの日本旅行足跡を記録：${SHARE_URL}\n`;
+            } else {
+                report += `🌟 【${appState.playerName}】的日本旅行成就紀錄報告 🌟\n`;
+                report += `🏆 目前稱號：${levelDetails.title} (LV ${levelDetails.level})\n`;
+                report += `📊 解鎖成就數：${totals.completed} / ${totals.total} 項 (達成率 ${Math.round(totals.completed / totals.total * 100)}%)\n`;
+                report += `🧭 日本足跡地圖：${appState.visitedPrefectures.length} / 47 都道府縣 (踏破率 ${Math.round(appState.visitedPrefectures.length / 47 * 100)}%)\n`;
+                if (unlockedBadges.length > 0) {
+                    report += `🎖️ 榮譽勳章牆：${unlockedBadges.join(', ')}\n`;
+                }
+                if (top3.length > 0) {
+                    report += `✨ 最引以為傲的里程碑：\n`;
+                    top3.forEach((ach, index) => {
+                        const name = getTranslation("ach-name-" + ach.id, ach.name);
+                        const desc = getTranslation("ach-desc-" + ach.id, ach.desc);
+                        report += `  ${index + 1}. 【${name}】 - ${desc}\n`;
+                    });
+                }
+                report += `\n📍 在此點亮你的日本旅行足跡：${SHARE_URL}\n`;
+            }
+            
+            navigator.clipboard.writeText(report).then(() => {
+                closeShareModal();
+                showNotification(getTranslation("copyTextSuccess"), "", "📋");
+            }).catch(err => {
+                console.error("Text copy failed:", err);
+                showNotification(getTranslation("copyFailed"), "", "⚠️");
+            });
         }
 
         // --- 18.5 Social Share Intents ---
